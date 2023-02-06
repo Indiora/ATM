@@ -11,26 +11,65 @@ const MySortebleTable = ({ table }) => {
   //                 { participant: "lulu", match_w_l: [3, 0], win: 1, loose: 0,  scores: 5 },
   //               ]);
 
+    const columns = [
+      { label: "Participant", accessor: "participant", sortable: true },
+      { label: "Match W-L", accessor: "match_w_l", sortable: false },
+      { label: "Set win", accessor: "win", sortable: true },
+      { label: "Set loose", accessor: "loose", sortable: true },
+      { label: "Set draw", accessor: "draw", sortable: true },
+      { label: "Scores", accessor: "scores", sortable: true, sortbyOrder: "desc" },
+    ];
+    
+    // const [tableData, handleSorting] =useSortableTable(table, columns)
 
+    useEffect(() => {
+      setTableData(getDefaultSorting(table, columns))
+    }, [table])
 
-  console.log(table)
+    const [tableData, setTableData] = useState(getDefaultSorting(table, columns));
 
-
-
-  const columns = [
-    { label: "Participant", accessor: "participant", sortable: true },
-    { label: "Match W-L", accessor: "match_w_l", sortable: false },
-    { label: "Set win", accessor: "win", sortable: true },
-    { label: "Set loose", accessor: "loose", sortable: true },
-    { label: "Set draw", accessor: "draw", sortable: true },
-    { label: "Scores", accessor: "scores", sortable: true, sortbyOrder: "desc" },
-  ];
-
-  const [tableData, handleSorting] = useSortableTable(table, columns);
+    function getDefaultSorting(defaultTableData, columns) {
+      const sorted = [...defaultTableData].sort((a, b) => {
+        const filterColumn = columns.filter((column) => column.sortbyOrder);
+    
+        let { accessor = "id", sortbyOrder = "asc" } = Object.assign(
+          {},
+          ...filterColumn
+        );
+    
+        if (a[accessor] === null) return 1;
+        if (b[accessor] === null) return -1;
+        if (a[accessor] === null && b[accessor] === null) return 0;
+    
+        const ascending = a[accessor]
+          .toString()
+          .localeCompare(b[accessor].toString(), "en", {
+            numeric: true,
+          });
+    
+        return sortbyOrder === "asc" ? ascending : -ascending;
+      });
+      return sorted;
+    }
+    
+    const handleSorting = (sortField, sortOrder) => {
+      if (sortField) {
+        const sorted = [...tableData].sort((a, b) => {
+          if (a[sortField] === null) return 1;
+          if (b[sortField] === null) return -1;
+          if (a[sortField] === null && b[sortField] === null) return 0;
+          return (
+            a[sortField].toString().localeCompare(b[sortField].toString(), "en", {
+              numeric: true,
+            }) * (sortOrder === "asc" ? 1 : -1)
+          );
+        });
+        setTableData(sorted);
+      }
+    };
 
   return (
     <>
-    <p>{table[0].draw}</p>
       <table className="table">
         <TableHead {...{ columns, handleSorting }} />
         <TableBody {...{ columns, tableData }} />

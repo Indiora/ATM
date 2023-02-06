@@ -1,7 +1,10 @@
 import classes from "./MySortebleTable.module.css";
-
+import React, { useState, useEffect } from 'react'
 
 const TableBody = ({ tableData, columns }) => {
+    const [table, setTable] = useState(tableData)
+
+    console.log(tableData)
     return (
      <tbody className={classes.tableBody}>
       {tableData.map((data) => {

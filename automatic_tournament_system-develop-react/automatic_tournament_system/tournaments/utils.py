@@ -133,19 +133,37 @@ class RoundRobin:
                     second_partic.get('match_w_l')[0] += second_partic_res
                     second_partic.get('match_w_l')[1] += first_partic_res
 
+                    print(f"current {match.get('state')}")
+                    print(f"prev {m.get('state')}")
+                    print(first_partic_res)
+                    print(second_partic_res)
+                    print(f"first {m.get('participants')[0]['isWinner']}")
+                    print(f"second {m.get('participants')[1]['isWinner']}")
+        
                     if match.get('state') == "PLAYED" and m.get('state') == 'SCHEDULED':
                         match['state'] = "PLAYED"
                         if first_partic_res > second_partic_res:
                             # add res in table
                             first_partic['win'] += 1
                             second_partic['loose'] += 1
-                        elif second_partic_res < first_partic_res:
+                        elif second_partic_res > first_partic_res:
                              # add res in table
                             second_partic['win'] += 1
                             first_partic['loose'] += 1
+                        elif second_partic_res == 0 and first_partic_res == 0:
+                            if int(match.get('participants')[0].get('resultText')) - int(match.get('participants')[1].get('resultText')) < 0:
+                                second_partic['win'] += 1
+                                first_partic['loose'] += 1
+                            elif int(match.get('participants')[0].get('resultText')) - int(match.get('participants')[1].get('resultText')) > 0:
+                                first_partic['win'] += 1
+                                second_partic['loose'] += 1
+                            else:
+                                second_partic['draw'] += 1
+                                first_partic['draw'] += 1
                         else:
                             second_partic['draw'] += 1
                             first_partic['draw'] += 1
+                            # test
                     elif match.get('state') == "SCHEDULED" and m.get('state') == 'PLAYED':
                         match['state'] = "SCHEDULED"
                         if  m.get('participants')[0]['isWinner'] == True:
@@ -166,12 +184,14 @@ class RoundRobin:
                             first_partic['win'] += 1
                             first_partic['draw'] -= 1
                             second_partic['draw'] -= 1
+                            second_partic['loose'] += 1
                         # d -> 2
                         elif m.get('participants')[0]['isWinner'] == False and \
                             m.get('participants')[1]['isWinner'] == False and match.get('participants')[1]['isWinner']==True:
                             second_partic['win'] += 1
                             second_partic['draw'] -= 1
                             first_partic['draw'] -= 1
+                            first_partic['loose'] += 1
                         # 2 -> 1
                         elif match.get('participants')[0]['isWinner'] == True and m.get('participants')[0]['isWinner']==False:
                             first_partic['win'] += 1

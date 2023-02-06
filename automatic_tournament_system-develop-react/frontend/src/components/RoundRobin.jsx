@@ -13,6 +13,7 @@ const RoundRobin = ({id, bracket}) => {
     const [bracketAll, setBracketAll] = useState(bracket)
     const [modalShow, setModalShow] = useState(false);
     const [table, setTable] = useState(bracket.table)
+
     const filter = (node) => {
       const exclusionClasses = ['tools', ''];
       return !exclusionClasses.some((classname) => node.classList?.contains(classname));
@@ -77,11 +78,10 @@ const RoundRobin = ({id, bracket}) => {
       setTable(data.table)
     }
     
-    // useEffect(() => {
-    //   console.log(bracketAll.table)
-    //   setB(bracketAll.table)
-
-    // }, [bracketAll.table])
+    const fullScrenHandler = () => {
+     
+    }
+    
   
     return (
       <div ref={ref} style={{padding: '0.5em'}}>
@@ -101,6 +101,18 @@ const RoundRobin = ({id, bracket}) => {
               >
                   <path d="M24 24H0v-8h2v6h20v-6h2v8zm-12-5.6l-7.7-7.7 1.4-1.4 5.3 5.3V0h2v14.6l5.3-5.3 1.4 1.4-7.7 7.7z"></path>
               </svg>
+            </button>
+            <button onClick={fullScrenHandler} style={{border: 'none' }} className="px-2">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              viewBox="0 0 20 20"
+              className="toolsSvg"
+            >
+              <path fill="none" d="M0 0H20V20H0z"></path>
+              <path d="M7 2H2v5l1.8-1.8L6.5 8 8 6.5 5.2 3.8 7 2zm6 0l1.8 1.8L12 6.5 13.5 8l2.7-2.7L18 7V2h-5zm.5 10L12 13.5l2.7 2.7L13 18h5v-5l-1.8 1.8-2.7-2.8zm-7 0l-2.7 2.7L2 13v5h5l-1.8-1.8L8 13.5 6.5 12z"></path>
+            </svg>
             </button>
           </div>
           <TransformComponent wrapperClass={'someText'}>
