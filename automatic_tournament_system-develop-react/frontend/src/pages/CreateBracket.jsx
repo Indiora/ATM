@@ -81,6 +81,7 @@ const CreateBracket = () => {
                                                 label='Points for victory'
                                                 name='points_victory'
                                                 errors={errors}
+                                                defaultValue={1}
                                                 register={register}
                                                 validationSchema={{ 
                                                     required: "⚠ This input is required." 
@@ -93,6 +94,7 @@ const CreateBracket = () => {
                                                 label='Points for draw'
                                                 name='points_draw'
                                                 errors={errors}
+                                                defaultValue={0}
                                                 register={register}
                                                 validationSchema={{ 
                                                     required: "⚠ This input is required." 
@@ -105,6 +107,7 @@ const CreateBracket = () => {
                                                 label='Points per loss'
                                                 name='points_loss'
                                                 errors={errors}
+                                                defaultValue={0}
                                                 register={register}
                                                 validationSchema={{ 
                                                     required: "⚠ This input is required." 

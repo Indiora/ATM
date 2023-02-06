@@ -4,13 +4,19 @@ import TableHead from './TableHead';
 import { useSortableTable } from '../../../hooks/useSortableTable';
 
 
-const MySortebleTable = ({table}) => {
+const MySortebleTable = ({ table }) => {
 
   // const data = ([{participant: "aboba", match_w_l: [0, 0], win: 1, loose: 1, draw: 1, scores: 4 },
   //                 { participant: "ibib", match_w_l: [1, 2], win: 1, loose: 2, scores: 2 },
   //                 { participant: "lulu", match_w_l: [3, 0], win: 1, loose: 0,  scores: 5 },
   //               ]);
-  
+
+
+
+  console.log(table)
+
+
+
   const columns = [
     { label: "Participant", accessor: "participant", sortable: true },
     { label: "Match W-L", accessor: "match_w_l", sortable: false },
@@ -24,6 +30,7 @@ const MySortebleTable = ({table}) => {
 
   return (
     <>
+    <p>{table[0].draw}</p>
       <table className="table">
         <TableHead {...{ columns, handleSorting }} />
         <TableBody {...{ columns, tableData }} />

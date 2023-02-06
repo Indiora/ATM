@@ -15,7 +15,8 @@ const CreateTournament = () => {
   const api = useAxios()
   const navigate = useNavigate()
   const { user } = useContext(AuthContext);
-  const [responseBody, setResponseBody] = useState({title: '', content: '', start_time: '', participants: '', game: '', prize: '', type: 'SE', creater_email: user.email});
+  const [responseBody, setResponseBody] = useState({title: '', content: '', start_time: '', participants: '', game: '', prize: '',
+                                                    type: 'SE', points_loss: '0', points_draw: '0', points_victory: '1', creater_email: user.email});
   const [inputFile, setInputFile] = useState(null);
 
   const inputChangeHandler = (inputValue) => {
@@ -157,6 +158,7 @@ const CreateTournament = () => {
                                                 label='Points for victory'
                                                 name='points_victory'
                                                 errors={errors}
+                                                defaultValue={1}
                                                 register={register}
                                                 validationSchema={{ 
                                                     required: "⚠ This input is required." 
@@ -169,6 +171,7 @@ const CreateTournament = () => {
                                                 label='Points for draw'
                                                 name='points_draw'
                                                 errors={errors}
+                                                defaultValue={0}
                                                 register={register}
                                                 validationSchema={{ 
                                                     required: "⚠ This input is required." 
@@ -180,6 +183,7 @@ const CreateTournament = () => {
                                             <MyFormGroupInput
                                                 label='Points per loss'
                                                 name='points_loss'
+                                                defaultValue={0}
                                                 errors={errors}
                                                 register={register}
                                                 validationSchema={{ 

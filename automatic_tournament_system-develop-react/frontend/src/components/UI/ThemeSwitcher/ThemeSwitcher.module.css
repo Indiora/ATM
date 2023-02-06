@@ -32,7 +32,7 @@
 
 .btn_circle:hover {
    
-    color: var(--dark-ligth-green);
-    border-color: var(--dark-ligth-green);
+    color: var(--highlight-color);
+    border-color: var(--highlight-color);
  
 }

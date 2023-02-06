@@ -4,8 +4,8 @@ function getDefaultSorting(defaultTableData, columns) {
   const sorted = [...defaultTableData].sort((a, b) => {
     const filterColumn = columns.filter((column) => column.sortbyOrder);
 
-    // accessor !!!!!
-    let { accessor = "participant", sortbyOrder = "asc" } = Object.assign(
+    // Merge all array objects into single object and extract accessor and sortbyOrder keys
+    let { accessor = "id", sortbyOrder = "asc" } = Object.assign(
       {},
       ...filterColumn
     );
