@@ -1,0 +1,48 @@
+.buttonDiv {
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.bnDiv {
+    height: 20rem !important;
+}
+
+.iconButton {
+    background: rgb(230, 230, 231); 
+    border: none;
+}
+
+.matchSvg {
+    display: block;
+    fill: var(--green);
+    background: var(--dark);
+    border: none;
+} 
+
+.matchSvg:hover {
+    fill: var(--dark-ligth-green);;
+    
+}
+
+.dad{
+    color: var(--dark-ligth-green);;
+}
+
+.myModalHeader{
+    background: var(--dark);
+    border-bottom: 1px solid var(--green);
+}
+
+.myModalBody{
+    background: var(--dark);
+}
+
+.divVS {
+    size: 14rem;
+    text-align: center;
+}
+
+.matchSpan {
+    /* color: var(--dark-font-color); */
+    color: var(--green);
+}

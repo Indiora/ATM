@@ -1,0 +1,149 @@
+.myMatch {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+    justify-content: space-between;
+}
+
+.side {
+    display: flex;
+    height: 100%;
+    width: 70%;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 0 0 1rem;
+       
+}
+
+.side:first-of-type {
+    border: 1px solid var(--border-color);
+    border-top-right-radius: 2px;
+    border-top-left-radius: 2px;
+    border-top-width: 2px;
+}
+
+.side:last-of-type {
+    border: 1px solid var(--border-color);
+    border-bottom-right-radius: 2px;
+    border-bottom-left-radius: 2px;
+    border-bottom-width: 2px;
+}
+
+.topText {
+    margin-bottom: 0.2rem;
+    min-height: 1.25rem;
+}
+
+.buttonDiv {
+    width: 70%;
+    text-align: center;
+}
+
+.bnDiv {
+    height: 20rem !important;
+}
+
+.iconButton {
+    background: rgb(230, 230, 231); 
+    border: none;
+}
+
+.matchSvg {
+    display: block;
+    fill: red;
+    background: inherit;
+    border: none;
+} 
+
+.matchSvg:hover {
+    fill: var(--dark-ligth-green);
+    
+}
+
+
+.myModalHeader{
+    background: inherit;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.myModalBody{
+    background: inherit;
+}
+
+.divVS {
+    background: inherit;
+    text-align: center;
+    font-size: 1.2em;
+}
+
+.matchSpan {
+    color: var(--green);
+}
+
+.score{
+    display: flex;
+    padding: 0 1rem;
+    align-items: center;
+    width: 20%;
+    justify-content: center;
+    
+}
+
+.hoverSide {
+    display: flex;
+    height: 100%;
+    width: 70%;
+    color: var(--dark-font-color);
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 0 0 1rem;
+   
+}
+
+.hoverSide:first-of-type {
+    color: red;
+    border: 1px solid var(--border-highlight-color);
+    border-top-right-radius: 2px;
+    border-top-left-radius: 2px;
+    border-top-width: 2px;
+}
+
+.hoverSide:last-of-type {
+    color: red;
+    border: 1px solid var(--border-highlight-color);
+    border-bottom-right-radius: 2px;
+    border-bottom-left-radius: 2px;
+    border-bottom-width: 2px;
+}
+
+.parName {
+    width: 100%;
+}
+
+.matchTitle {
+    margin-left: auto;
+}
+
+.dateInput {
+    background: inherit;
+    color: inherit;
+    outline: none;
+    border: none;
+}
+
+.myInput {
+    width: 50%;
+    text-align: center;
+    border: none;
+    background: var(--dark);
+    color: var(--dark-font-color);
+}
+
+.myInput:focus {
+    border: 1px solid;
+    color: var(--dark-font-color);
+    border-color: var(--border-color);
+    outline:var(--green);
+    
+    }
+

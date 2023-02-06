@@ -1,0 +1,203 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --dark: #151616;
+    --ligth: rgb(231, 230, 230);
+    --border-color: rgb(231, 230, 230);
+    --border-highlight-color: red;
+    --highlight-color: red;
+    --fill-color: rgb(231, 230, 230);
+
+    --ultra-ligth: white;
+    --ligth-dark: #151616;
+
+    
+    --green: rgb(226, 223, 223);
+    --dark-green: white;
+    --dark-ligth-green: blue;
+    --dark-font-color: white;  
+    --dark-second: rgb(34, 37, 43);;
+}
+
+
+body {
+    font-family: 'Ubuntu', sans-serif;
+    background: var(--dark);
+    color: var(--ligth);  
+
+}
+
+body.light {
+    background: var(--ligth);
+    color: var(--dark);  
+    --border-color: #151616;
+    --border-highlight-color: blue;
+    --highlight-color: blue;
+    --fill-color: #151616;
+}
+
+body  a {
+    color: var(--ligth);  
+}
+
+body.light a {
+    color: var(--dark);  
+}
+
+.table {
+    color: inherit;
+}
+
+
+
+.tournaments_card_body {
+    /* border: 1px solid var(--ligth-dark);
+    border-top: 0px; */
+    border-top: 1px solid var(--border-color);
+}
+
+section {
+    min-height: 100vh;
+    
+}
+
+.tournaments_section {
+    min-height: 85vh;
+}
+
+.home_div {
+    text-align: center;
+}
+
+.form_button_div {
+    margin-left: 15%;
+    width: 15rem;
+}
+
+
+.search_input {
+    background-color: inherit;
+    border-color: var(--border-color);
+    color: inherit;
+}
+
+.search_input:focus {
+    background-color: inherit;
+    border-color: var(--border-highlight-color);
+    color: inherit; 
+}
+
+.card_profile_form {
+
+}
+
+.scrool_div {
+    background: inherit;
+    height: 1px;
+}
+
+.tournament_card {
+    background: inherit;    
+    border: 1px solid var(--border-color);
+    /* border-bottom: 1px solid var(--ligth-dark); */
+}
+
+.tournament_card:hover {
+    color: var(--highlight-color) !important; 
+    box-shadow: 0 .5rem 1rem var(--ultra-ligth);
+    border: 1px solid var(--border-highlight-color);
+}
+
+.tournament_card a{
+    color: var(--green);
+    text-decoration: none;
+}
+
+
+.my_log_input {
+    background: var(--dark);
+    color: var(--dark-font-color) !important;
+    border-color: var(--green);
+    outline:var(--green);   
+}
+
+a {
+    color: var(--green);
+    text-decoration: none;
+}
+
+a:hover {
+    color: var(--highlight-color) !important; 
+}
+
+.log_div {
+    width: 25%;
+}
+
+.my_log_input:focus {
+    background: var(--ligth-dark);
+    color: var(--dark-font-color) !important;
+    border-color: var(--green);
+    outline:var(--green);
+}
+
+.profile-container {
+    
+
+}
+
+.profile-icon {
+
+    width: 100px;
+    height: 100px;
+}
+
+.my_input {
+    background: var(--ligth-dark);
+    color: var(--dark-font-color);
+    border-color: var(--dark-green) !important;
+    outline:var(--green) !important;
+}
+
+
+.my_input:focus {
+    background: var(--ligth-dark);
+    color: var(--dark-font-color);
+    border-color: var(--green);
+    outline:var(--green);
+}
+
+.my_accordion_body {
+    background: inherit !important;
+}
+
+.my_accordion_body button {
+    color: inherit !important;
+    background: inherit !important;
+    box-shadow: none !important;
+    border-color:var(--green) !important;
+}
+
+.accordion-button:not(.collapsed)::after {
+    background-image: none;
+    border-color:var(--green) !important;
+}
+
+.accordion-item {
+    background: inherit;
+    border: 1px solid var(--ligth);
+}
+
+.loader {
+    display: flex;
+    justify-content: center;
+    margin-top: 50px;
+}
+
+.tournament_img {
+    width: 100%;
+}
