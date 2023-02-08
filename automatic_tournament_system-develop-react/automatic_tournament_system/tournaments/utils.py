@@ -118,7 +118,7 @@ class RoundRobin:
     def set_match_score(match, bracket):
         # search round
         for round in bracket.get('rounds'):
-            # search match
+            # search match remove index ?
             for index, m in enumerate(round):
                 if m['id'] == match['id']:
                     first_partic_res = int(match.get('participants')[0].get('resultText')) - int(m.get('participants')[0].get('resultText'))
@@ -292,9 +292,58 @@ class RoundRobin:
         # return round_robin_bracket
         return {'rounds': round_robin_bracket, 'table': self.match_table, 'points': self.points}
     
+
+class SingleEl:
+
+    def __init__(self, participants) -> None:
+        self.participants = [self.append_participant(name) for name in participants]
+
+    def single_el_number_of_rounds(self) -> int:
+        return math.ceil(math.log2(len(self.participants)))
+
+    def append_participant(self, name) -> dict:
+        return  {
+                    'id': secrets.token_hex(16),
+                    'participant': f"{name}",
+                    'score': 0
+                }
+
+    def get_participant(self) -> dict:
+        if self.participants:
+            return self.participants.pop()
+        return self.append_participant('---')
     
+    @staticmethod
+    def set_match_score(current_match, bracket):
+        for round in bracket:
+            # search match
+            for index, prev_match in enumerate(round['seeds']):
+                if prev_match.get('id') == current_match.get('id'):
+                    if current_match.get('state')  == "SCHEDULED": 
+                        round['seeds'][index] = current_match
+                    
+                    break
 
 
-
+    def create_se_bracket(self):
+        rounds = []
+        nummber_of_rounds = self.single_el_number_of_rounds()
+        number_of_match = 2**nummber_of_rounds
+        print(nummber_of_rounds)
+        for i in range(1, nummber_of_rounds+1):
+            round = {'title': i, 'seeds': []}
+            for j in range(int(number_of_match / 2**i )):
+                round.get('seeds').append(
+                    {
+                        'id': j + 2**i,
+                        "startTime": "2023-05-30",
+                        "state": "SCHEDULED",
+                        'teams': [
+                            self.get_participant(),
+                            self.get_participant()
+                        ]
+                    })
+            rounds.append(round)
+        return rounds
 
 

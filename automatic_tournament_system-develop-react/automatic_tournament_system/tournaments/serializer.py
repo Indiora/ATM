@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from .models import Tournament, Bracket
-from .utils import SingleElimination, RoundRobin, clear_participants
+from .utils import SingleElimination, RoundRobin, SingleEl, clear_participants
 from rest_framework.parsers import JSONParser
 from profiles.models import Profile
 
@@ -16,10 +16,11 @@ class TournamentSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         if self.initial_data.get('type') == 'SE':
-            tournament_tree = SingleElimination(clear_participants(validated_data.get('participants')))
-            bracket = tournament_tree.create_bracket()
+            single_el = SingleEl(clear_participants(validated_data.get('participants')))
+            bracket = single_el.create_se_bracket()
+            # tournament_tree = SingleElimination(clear_participants(validated_data.get('participants')))
+            # bracket = tournament_tree.create_bracket()
         elif self.initial_data.get('type') == 'RR':
-            print(self.initial_data.get('points_victory'))
             round_robin = RoundRobin(clear_participants(self.initial_data.get('participants')),
              {'win': int(self.initial_data.get('points_victory')), 'loss': int(self.initial_data.get('points_loss')), 'draw': int(self.initial_data.get('points_draw'))})
             bracket = round_robin.create_round_robin_bracket()
@@ -51,7 +52,10 @@ class BracketSerializer(serializers.ModelSerializer):
         return bracket 
 
     def update(self, instance, validated_data): 
-        RoundRobin.set_match_score(self.initial_data, instance.bracket)
+        if instance.type == 'SE':
+            SingleEl.set_match_score(self.initial_data, instance.bracket)
+        elif instance.type == 'RR':
+            RoundRobin.set_match_score(self.initial_data, instance.bracket)
         return super().update(instance, validated_data)
 
 

@@ -16,7 +16,7 @@ function Tournaments() {
     const [tournaments, setTournaments] = useState([]);
     const [filter, setFilter] = useState({sort: '', query: ''});
     const [totalPages, setTotalPages] = useState(0);
-    const [limit, setLimit] = useState(9);
+    const [limit, setLimit] = useState(12);
     const [page, setPage] = useState(1);
     const lastElement = useRef()
     

@@ -7,7 +7,7 @@ from rest_framework.views import APIView
 from .models import Tournament, Bracket
 from .serializer import TournamentSerializer, BracketSerializer, AllBracketSerealizer
 
-from .permissions import IsTournamenOwnerOrReadOnly
+from .permissions import IsTournamenOwnerOrReadOnly, IsBracketOwnerOrReadOnly
 
 
 class LargeResultsSetPagination(PageNumberPagination):
@@ -72,4 +72,7 @@ class TournamentUpdateApiView(generics.UpdateAPIView):
 class BracketUpdateAPIView(generics.UpdateAPIView):
     queryset = Bracket.objects.all()
     serializer_class = BracketSerializer
+    permission_classes = ((IsBracketOwnerOrReadOnly|IsAdminUser),)
     lookup_field = 'id'
+
+    

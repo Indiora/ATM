@@ -7,45 +7,17 @@ import def_tour from "../assets/img/d_t.png"
 import useAxios from '../utils/useAxios';
 import { AuthContext } from '../context';
 import { useNavigate } from "react-router-dom";
-import { CustomSingleEliminationBracket } from '../components/CustomSingleElimination';
-import { CustomDoubleElimination } from '../components/CustomDoubleElimination';
 import MyButton from '../components/UI/button/MyButton';
 import RoundRobin from '../components/RoundRobin';
 import Accordion from 'react-bootstrap/Accordion';
 import moment from 'moment'
-
+import SingleEl from '../components/SingleEl';
 
 const Tournament = () => {
 
-    
-
     const params = useParams()
     const [id, setId] = useState(0)
-    const [bracket, setBracket] = useState([{
-                                            "id": 1,
-                                            "nextMatchId": 0,
-                                            "tournamentRoundText": "test",
-                                            "startTime": "2021-05-30",
-                                            "state": "SCHEDULED",
-                                            "participants": [
-                                            {
-                                                "id": "d1",
-                                                "resultText": 0,
-                                                "isWinner": false,
-                                                "status": null,
-                                                "name": "not",
-                                                "picture": null
-                                            },
-                                            {
-                                                "id": "d1",
-                                                "resultText": 0,
-                                                "isWinner": false,
-                                                "status": null,
-                                                "name": "not",
-                                                "picture": null
-                                            }
-                                            ]
-                                        }])
+    const [bracket, setBracket] = useState([])
 
     const [tournament, setTournament] = useState({})
    
@@ -56,8 +28,6 @@ const Tournament = () => {
         setTournament(response.data)    
     })
     
-
-
     const api = useAxios();
     const navigate = useNavigate()
     const onDelete = async () => {
@@ -127,16 +97,15 @@ const Tournament = () => {
                                                         : <> {(() => {
                                                             if (types == "SE") {
                                                                 return (
-                                                                
-                                                                <CustomSingleEliminationBracket bracket={bracket}/>
+                                                                    <SingleEl id={id} bracket={bracket} owner={tournament.owner}/>    
                                                                 )
                                                             } else if (types == "RR") {
                                                                 return (
-                                                                <RoundRobin id={id} bracket={bracket}/>
+                                                                    <RoundRobin id={id} bracket={bracket} owner={tournament.owner}/>
                                                                 )
                                                             } else if (types == "DE") {
                                                                 return (
-                                                                <CustomDoubleElimination/>
+                                                                    <RoundRobin id={id} bracket={bracket} owner={tournament.owner}/>
                                                                 )
                                                             }
                                                         })()} </>
