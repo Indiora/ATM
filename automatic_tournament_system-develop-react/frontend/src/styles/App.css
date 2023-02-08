@@ -267,3 +267,9 @@ a:hover {
     left: 0;
     overflow: hidden;
   }
+
+input[type="checkbox"] {
+    accent-color: var(--opposite);
+    background-color: var(--opposite);
+}
+

@@ -11,6 +11,8 @@ import MyFormGroupInput from '../components/UI/MyFormGroupInput/MyFormGroupInput
 import MyButton from '../components/UI/button/MyButton';
 import MyCard from '../components/UI/MyCard/MyCard';
 
+
+
 const CreateTournament = () => {
   const api = useAxios()
   const navigate = useNavigate()
@@ -150,6 +152,15 @@ const CreateTournament = () => {
                       <option value="RR">Round Robin</option>
                   </Form.Select>
                   </Form.Group>
+                  {responseBody.type === "SE"
+                      ? 
+                        <div>
+                          <input type='checkbox' className='mx-1'/>
+                          <label> Include a match for 3rd place between semifinal losers</label>
+                        </div>
+                        
+                      : <></>
+                  }
                   {responseBody.type === "RR"
                                 ? <>
                                     <div className='row'>
