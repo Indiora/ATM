@@ -11,8 +11,8 @@ export const SeedItem = styled.div`
 `;
 
 export const SeedTeam = styled.div`
-  background: inherit;
-  padding: 0.3rem 0.5rem;
+  background: #5e5555;
+  padding: 0.2rem 0.5rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -82,7 +82,7 @@ export const SingleLineSeed = styled.div(
 
 export const Seed = styled.div(
   (props) => `
-  padding: 1em 1.5em;
+  padding: 0.1em 1.5em;
   min-width: 225px;
   width:100%;
   position: relative;

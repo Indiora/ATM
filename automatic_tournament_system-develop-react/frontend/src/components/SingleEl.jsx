@@ -7,23 +7,29 @@ import MyMatch from "./UI/MyMatch/MyMatch";
 
 const SingleEl = ({bracket, id, owner}) => {
     const [rounds, setBracket] = useState(bracket)
-
+  
     const handleBracketChange = (data) => {
         setBracket(data)
     }
 
+    console.log(bracket)
+    // setB(rounds.shift())
+
+      
     return (
-        <Bracket mobileBreakpoint={992}>
-            {rounds.map((round) => 
-                <Round key={round.title} mobileBreakpoint={992}>
-                    <SeedsList>
-                        {round.seeds.map((seed, idx) => 
-                        <MyMatch key={idx} owner={owner} id={id} seed={seed} onPatch={handleBracketChange}/>
-                        )}
-                    </SeedsList>
-                </Round>
-            )}
-        </Bracket>
+        <BracketWrapper>
+            <Bracket mobileBreakpoint={992}>
+                {rounds.map((round) => 
+                    <Round key={round.title} mobileBreakpoint={992}>
+                        <SeedsList>
+                            {round.seeds.map((seed, idx) => 
+                            <MyMatch key={idx} owner={owner} id={id} seed={seed} onPatch={handleBracketChange}/>
+                            )}
+                        </SeedsList>
+                    </Round>
+                )}
+            </Bracket>
+        </BracketWrapper>
     )};
 
 

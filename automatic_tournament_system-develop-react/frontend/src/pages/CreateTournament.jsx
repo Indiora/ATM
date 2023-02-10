@@ -18,7 +18,7 @@ const CreateTournament = () => {
   const navigate = useNavigate()
   const { user } = useContext(AuthContext);
   const [responseBody, setResponseBody] = useState({title: '', content: '', start_time: '', participants: '', game: '', prize: '',
-                                                    type: 'SE', points_loss: '0', points_draw: '0', points_victory: '1', creater_email: user.email});
+                                                    type: 'SE', points_loss: '0', points_draw: '0', secod_final: false, points_victory: '1', creater_email: user.email});
   const [inputFile, setInputFile] = useState(null);
 
   const inputChangeHandler = (inputValue) => {
@@ -29,13 +29,19 @@ const CreateTournament = () => {
   const inputSelectChangeHandler = (event) => {
     const {name, value} = event.target
     setResponseBody({...responseBody, [name]: value})
-}
+  }
 
+  const inputCheckBoxChangeHandler = (e) => {
+      const { target } = e;
+      const value = target.type === 'checkbox' ? target.checked : target.value;
+      const { name } = target;
+      setResponseBody({...responseBody, [name]: value})
+  }
 
   const {
-    register,
-    handleSubmit,
-    formState: { errors },
+      register,
+      handleSubmit,
+      formState: { errors },
   } = useForm({mode: "onBlur"});
 
   const onSubmitHandler = () => {
@@ -154,11 +160,11 @@ const CreateTournament = () => {
                   </Form.Group>
                   {responseBody.type === "SE"
                       ? 
-                        <div>
-                          <input type='checkbox' className='mx-1'/>
-                          <label> Include a match for 3rd place between semifinal losers</label>
-                        </div>
-                        
+                      <Form.Check type='checkbox'>
+                        <Form.Check.Input name='secod_final'
+                        onChange={(e)=>inputCheckBoxChangeHandler(e)} className='my_ckeckbox' type='checkbox'/>
+                        <Form.Check.Label style={{color: 'inherit'}}>{`Include a match for 3rd place between semifinal losers`}</Form.Check.Label>
+                      </Form.Check>
                       : <></>
                   }
                   {responseBody.type === "RR"

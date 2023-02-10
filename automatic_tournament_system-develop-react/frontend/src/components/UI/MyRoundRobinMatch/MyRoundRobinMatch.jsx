@@ -7,6 +7,7 @@ import useAxios from "../../../utils/useAxios";
 import { useForm } from 'react-hook-form';
 import MyRadioButton from "../MyRadioButton/MyRadioButton";
 import { AuthContext } from "../../../context";
+import moment from 'moment'
 
 
 const MyRoundRobinMatch = ({id, match, onPatch, owner}) => {
@@ -93,7 +94,7 @@ const MyRoundRobinMatch = ({id, match, onPatch, owner}) => {
     return (
         <div className="col-3">
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-            <p className={classes.topText}>{match.startTime}</p>
+            <div className={classes.topText}>{moment(match.startTime).format('dddd HH:mm') || ''}</div>
            
             </div>
             <div className={classes.myMatch}>

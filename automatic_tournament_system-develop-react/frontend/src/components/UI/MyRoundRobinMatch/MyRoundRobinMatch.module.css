@@ -30,6 +30,9 @@
 }
 
 .topText {
+    width: 60%;
+    margin: auto;
+    font-size: 14px;
     margin-bottom: 0.2rem;
     min-height: 1.25rem;
 }

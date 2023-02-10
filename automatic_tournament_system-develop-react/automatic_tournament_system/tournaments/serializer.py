@@ -3,7 +3,7 @@ from .models import Tournament, Bracket
 from .utils import SingleElimination, RoundRobin, SingleEl, clear_participants
 from rest_framework.parsers import JSONParser
 from profiles.models import Profile
-
+import json
 
 #CurrentUserDefault ?
 class TournamentSerializer(serializers.ModelSerializer):
@@ -16,7 +16,7 @@ class TournamentSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         if self.initial_data.get('type') == 'SE':
-            single_el = SingleEl(clear_participants(validated_data.get('participants')))
+            single_el = SingleEl(clear_participants(validated_data.get('participants')), json.loads(self.initial_data.get('secod_final')))
             bracket = single_el.create_se_bracket()
             # tournament_tree = SingleElimination(clear_participants(validated_data.get('participants')))
             # bracket = tournament_tree.create_bracket()

@@ -24,6 +24,7 @@ body {
     font-family: 'Ubuntu', sans-serif;
     background: var(--dark);
     color: var(--ligth);  
+    color: #5e5555;
     
 
 }
@@ -268,8 +269,16 @@ a:hover {
     overflow: hidden;
   }
 
-input[type="checkbox"] {
-    accent-color: var(--opposite);
-    background-color: var(--opposite);
+
+.my_ckeckbox {
+    box-shadow: none !important;
+    border-color: var(--border-color) !important;
+    accent-color: var(--opposite) !important;
+    filter: brightness(40%);
 }
 
+
+.my_ckeckbox:checked {
+    background-color: inherit;
+    border-color: var(--border-color);
+}

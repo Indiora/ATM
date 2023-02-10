@@ -7,7 +7,7 @@ import MyButton from  "../button/MyButton";
 import useAxios from "../../../utils/useAxios";
 import { AuthContext } from "../../../context";
 import MyRadioButton from "../MyRadioButton/MyRadioButton";
-
+import moment from 'moment'
 
 const MyMatch = ({id, seed, onPatch, owner}) => {
     const [modalShow, setMatchCardModalShow] = useState(false);
@@ -73,7 +73,7 @@ const MyMatch = ({id, seed, onPatch, owner}) => {
 return (
   <Seed 
     mobileBreakpoint={992} style={{ fontSize: 14 }}>
-    <div>{seed.startTime}</div>
+    <div>{moment(seed.startTime).format('dddd HH:mm') || ''}</div>
     <SeedItem > 
         <div id={`id${seed.teams[0]?.id}`}
             className={classes.side}

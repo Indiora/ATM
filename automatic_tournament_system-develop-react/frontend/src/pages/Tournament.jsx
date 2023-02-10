@@ -12,6 +12,8 @@ import RoundRobin from '../components/RoundRobin';
 import Accordion from 'react-bootstrap/Accordion';
 import moment from 'moment'
 import SingleEl from '../components/SingleEl';
+import SomeFun from '../components/test';
+
 
 const Tournament = () => {
 
@@ -70,7 +72,7 @@ const Tournament = () => {
                                             <div className="d-flex flex-column pt-1">
                                                 <h3 className='tournament_text'>{tournament.title}</h3>
                                                 <p>Start of the tournament</p>
-                                                <p className='tournament_text'>{moment(tournament.start_time).format('MMMM Do YYYY') || ''}</p>
+                                                <p className='tournament_text'>{moment(tournament.start_time).format(' Do MMMM  YYYY, hh:mm') || ''}</p>
                                                 <p>Game</p>
                                                 <p className='tournament_text'>{tournament.game }</p>
                                                 <p>Prize fund</p>
