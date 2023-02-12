@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from .models import Tournament, Bracket
-from .utils import SingleElimination, RoundRobin, SingleEl, clear_participants
+from .utils import SingleElimination, RoundRobin, SingleEl, DoubleEl, clear_participants
 from rest_framework.parsers import JSONParser
 from profiles.models import Profile
 import json
@@ -15,18 +15,17 @@ class TournamentSerializer(serializers.ModelSerializer):
         fields = ['id', 'slug', 'title', 'content', 'participants', 'poster', 'game', 'prize', 'created_at', 'start_time', 'owner']  
 
     def create(self, validated_data):
+        
         if self.initial_data.get('type') == 'SE':
             single_el = SingleEl(clear_participants(validated_data.get('participants')), json.loads(self.initial_data.get('secod_final')))
             bracket = single_el.create_se_bracket()
-            # tournament_tree = SingleElimination(clear_participants(validated_data.get('participants')))
-            # bracket = tournament_tree.create_bracket()
         elif self.initial_data.get('type') == 'RR':
             round_robin = RoundRobin(clear_participants(self.initial_data.get('participants')),
              {'win': int(self.initial_data.get('points_victory')), 'loss': int(self.initial_data.get('points_loss')), 'draw': int(self.initial_data.get('points_draw'))})
             bracket = round_robin.create_round_robin_bracket()
-        elif validated_data.get('type') == 'DE':
-            print('Double Elimenation bracket')
-            return 
+        elif self.initial_data.get('type') == 'DE':
+            double_el = DoubleEl(clear_participants(validated_data.get('participants')))
+            bracket = double_el.create_se_bracket()
             
         tournament = Tournament.objects.create(**validated_data, owner=Profile.objects.get(user__email=self.initial_data.get('creater_email')))
         Bracket.objects.create(tournament=tournament, bracket=bracket, type=self.initial_data.get('type'))

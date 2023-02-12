@@ -70,11 +70,11 @@ export const SingleLineSeed = styled.div(
       }
       &:nth-child(even)::after {
         border-bottom: 1px solid #707070;
-        top: -0.5px;
+        top: -6px;
       }
       &:nth-child(odd)::after {
         border-top: 1px solid #707070;
-        top: calc(50% - 0.5px);
+        top: calc(50% - 6px);
       }
   }
 `

@@ -282,3 +282,13 @@ a:hover {
     background-color: inherit;
     border-color: var(--border-color);
 }
+
+/* .fullscreen-enabled .react-transform-component {
+   width: 90%;
+   height: 100%;
+} 
+
+.fullscreen-enabled .react-transform-wrapper {
+    width: 90%;
+    height: 100%;
+}  */

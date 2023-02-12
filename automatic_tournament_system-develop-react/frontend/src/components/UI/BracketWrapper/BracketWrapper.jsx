@@ -73,8 +73,9 @@ const BracketWrapper = ({children}) => {
 
 
   return (
-    <FullScreen handle={handleFullScreen}>
-      <div ref={ref} style={{padding: '0.5em'}}>
+    
+      <div ref={ref}>
+        <FullScreen handle={handleFullScreen}>
         <TransformWrapper performance={true}>
           <React.Fragment>
             <div className="tools">
@@ -126,8 +127,9 @@ const BracketWrapper = ({children}) => {
               </div>
             </Modal.Body>
         </MyModal>
-      </div>
-    </FullScreen>
+      </FullScreen>
+    </div>
+    
 )
 };
 export default BracketWrapper;

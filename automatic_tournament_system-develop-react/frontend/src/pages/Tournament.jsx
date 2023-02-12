@@ -8,12 +8,11 @@ import useAxios from '../utils/useAxios';
 import { AuthContext } from '../context';
 import { useNavigate } from "react-router-dom";
 import MyButton from '../components/UI/button/MyButton';
-import RoundRobin from '../components/RoundRobin';
 import Accordion from 'react-bootstrap/Accordion';
 import moment from 'moment'
+import RoundRobin from '../components/RoundRobin';
 import SingleEl from '../components/SingleEl';
-import SomeFun from '../components/test';
-
+import DoubleEl from '../components/DoubleEl';
 
 const Tournament = () => {
 
@@ -107,7 +106,7 @@ const Tournament = () => {
                                                                 )
                                                             } else if (types == "DE") {
                                                                 return (
-                                                                    <RoundRobin id={id} bracket={bracket} owner={tournament.owner}/>
+                                                                    <DoubleEl id={id} bracket={bracket} owner={tournament.owner}/>
                                                                 )
                                                             }
                                                         })()} </>

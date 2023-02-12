@@ -17,7 +17,7 @@ const SingleEl = ({bracket, id, owner}) => {
 
       
     return (
-        <BracketWrapper>
+        // <BracketWrapper>
             <Bracket mobileBreakpoint={992}>
                 {rounds.map((round) => 
                     <Round key={round.title} mobileBreakpoint={992}>
@@ -29,7 +29,7 @@ const SingleEl = ({bracket, id, owner}) => {
                     </Round>
                 )}
             </Bracket>
-        </BracketWrapper>
+        // </BracketWrapper>
     )};
 
 
