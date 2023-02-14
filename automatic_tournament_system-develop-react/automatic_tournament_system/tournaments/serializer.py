@@ -1,11 +1,10 @@
 from rest_framework import serializers
 from .models import Tournament, Bracket
-from .utils import SingleElimination, RoundRobin, SingleEl, DoubleEl, clear_participants
-from rest_framework.parsers import JSONParser
+from .utils import RoundRobin, SingleEl, DoubleEl, clear_participants
 from profiles.models import Profile
 import json
 
-#CurrentUserDefault ?
+
 class TournamentSerializer(serializers.ModelSerializer):
     slug = serializers.CharField(required=False)
     owner = serializers.StringRelatedField(required=False) 
@@ -40,13 +39,14 @@ class BracketSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         # initial_data потому что нету в модели Bracket, а передается как дополнительное поле
         if validated_data.get('type') == 'SE':
-            tournament_tree = SingleElimination(clear_participants(self.initial_data.get('participants')))
-            bracket = Bracket.objects.create(bracket=tournament_tree.create_bracket(), type=validated_data.get('type'))
+            single_el = SingleEl(clear_participants(validated_data.get('participants')), json.loads(self.initial_data.get('secod_final')))
+            bracket = single_el.create_se_bracket()
         elif validated_data.get('type') == 'RR':
             round_robin = RoundRobin(clear_participants(self.initial_data.get('participants')))
             bracket = Bracket.objects.create(bracket=round_robin.create_round_robin_bracket(), type=validated_data.get('type'))
         elif validated_data.get('type') == 'DE':
-            print('Double Elimenation bracket')
+            double_el = DoubleEl(clear_participants(validated_data.get('participants')))
+            bracket = double_el.create_se_bracket()
         
         return bracket 
 
@@ -55,6 +55,8 @@ class BracketSerializer(serializers.ModelSerializer):
             SingleEl.set_match_score(self.initial_data, instance.bracket)
         elif instance.type == 'RR':
             RoundRobin.set_match_score(self.initial_data, instance.bracket)
+        elif instance.type == 'DE':
+            DoubleEl.set_match_score(self.initial_data, instance.bracket)
         return super().update(instance, validated_data)
 
 
@@ -66,7 +68,6 @@ class BracketsField(serializers.RelatedField):
 
 class AllBracketSerealizer(serializers.ModelSerializer):
     brackets = BracketsField(many=True, read_only=True)
-    
 
     class Meta:
         model = Tournament
