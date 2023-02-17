@@ -53,23 +53,25 @@
 
 .matchSvg {
     display: block;
-    fill: red;
+    fill: var(--dark-ligth);
     background: inherit;
     border: none;
 } 
 
 .matchSvg:hover {
-    fill: var(--dark-ligth-green);  
+    fill: var(--highlight-color);   
 }
 
 
 .myModalHeader{
-    background: inherit;
+    color: var(--dark-ligth);
+    background: var(--opposite);
     border-bottom: 1px solid var(--border-color);
 }
 
 .myModalBody{
-    background: inherit;
+    color: var(--dark-ligth);
+    background: var(--opposite);
 }
 
 .divVS {
@@ -103,7 +105,7 @@
 }
 
 .hoverSide:first-of-type {
-    color: red;
+    
     border: 1px solid var(--border-highlight-color);
     border-top-right-radius: 2px;
     border-top-left-radius: 2px;
@@ -111,7 +113,7 @@
 }
 
 .hoverSide:last-of-type {
-    color: red;
+    
     border: 1px solid var(--border-highlight-color);
     border-bottom-right-radius: 2px;
     border-bottom-left-radius: 2px;

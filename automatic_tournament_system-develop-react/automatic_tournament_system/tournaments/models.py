@@ -26,8 +26,8 @@ class Tournament(models.Model):
 
     def save(self, *args, **kwargs):
         self.slug = slugify(self.title)
-        if not self.poster:
-            self.poster = f'tournament_def_{random.randint(1, 13)}.png'
+        # if not self.poster:
+        #     self.poster = f'tournament_def_{random.randint(1, 13)}.png'
         super().save(*args, **kwargs)
 
     def __str__(self):

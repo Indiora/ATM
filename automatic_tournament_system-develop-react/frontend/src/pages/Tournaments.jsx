@@ -44,11 +44,12 @@ function Tournaments() {
  
 
     return (
-        <section className="container tournaments_section pb-3">
+        <section className="container tournaments_section pb-5">
             {postError &&
                 <h1>Error ${postError}</h1>
             }
             <TournamentFilter filter={filter} setFilter={setFilter}/>
+            <hr></hr>
             <Row>
                 <Col lg={12}>
                     <TournamentList tournaments={sortedAndSearchedTournaments} title="title"/>

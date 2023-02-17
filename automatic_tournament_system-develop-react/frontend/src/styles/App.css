@@ -6,17 +6,17 @@
 
 :root {
     --dark: #151616;
-    --ligth: rgb(231, 230, 230);
-    --border-color: rgb(231, 230, 230);
-    --border-highlight-color: rgb(255, 77, 77);
-    --highlight-color: rgb(255, 77, 77);
-    --fill-color: rgb(231, 230, 230);
+    --ligth: white;
+    --border-color: rgb(151, 151, 151);
+    --border-highlight-color: rgb(142, 130, 255);
+    --highlight-color: rgb(142, 130, 255);
+    --fill-color: white;
 
     --ultra-ligth: white;
     --ligth-dark: #151616;
     --opposite: #151616;
+    --dark-ligth: white;
 
-  
 }
 
 
@@ -24,7 +24,7 @@ body {
     font-family: 'Ubuntu', sans-serif;
     background: var(--dark);
     color: var(--ligth);  
-    color: #5e5555;
+   
     
 
 }
@@ -33,19 +33,13 @@ body.light {
     background: var(--ligth);
     color: var(--dark);  
     --border-color: #151616;
-    --border-highlight-color: #4b66ce;
-    --highlight-color: #4b66ce;
+    --border-highlight-color: rgb(58, 192, 91);
+    --highlight-color: rgb(58, 192, 91);
     --fill-color: #151616;
     --opposite: rgb(231, 230, 230);
+    --dark-ligth: #151616;
 }
 
-body  a {
-    color: var(--ligth);  
-}
-
-body.light a {
-    color: var(--dark);  
-}
 
 .table {
     color: inherit;
@@ -70,6 +64,7 @@ section {
 }
 
 .home_div {
+    min-height: 100vh;
     text-align: center;
 }
 
@@ -102,19 +97,20 @@ section {
 
 .tournament_card {
     background: inherit;    
-    border: 1px solid var(--border-color);
+    border: none;
+    /* border: 1px solid var(--border-color); */
     /* border-bottom: 1px solid var(--ligth-dark); */
 }
 
-.tournament_card:hover {
-    color: var(--highlight-color) !important; 
-    box-shadow: 0 .5rem 1rem var(--highlight-color);
-    border: 1px solid var(--border-highlight-color);
+.card {
+    background-color: inherit;
 }
 
-.tournament_card a{
-    color: var(--green);
-    text-decoration: none;
+.tournament_card:hover {
+    color: var(--dark-ligth);
+    /* color: var(--highlight-color) !important;  */
+    box-shadow: 0 .5rem 1rem rgb(99, 98, 98);
+    /* border: 1px solid var(--border-highlight-color); */
 }
 
 
@@ -126,12 +122,12 @@ section {
 }
 
 a {
-    color: var(--green);
+    color: var(--dark-ligth);
     text-decoration: none;
 }
 
 a:hover {
-    color: var(--highlight-color) !important; 
+    color: var(--highlight-color); 
 }
 
 .log_div {
@@ -214,7 +210,12 @@ a:hover {
 }
 
 .tournament_img {
-    width: 100%;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    width: 26rem;
+    height: 26rem;
+    text-align: center;
 }
 
 [data-tooltip] {
@@ -268,6 +269,11 @@ a:hover {
     left: 0;
     overflow: hidden;
   }
+
+.my_svg{
+    fill: var(--fill-color)
+}
+
 
 
 .my_ckeckbox {

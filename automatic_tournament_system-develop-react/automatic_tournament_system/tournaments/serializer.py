@@ -39,14 +39,16 @@ class BracketSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         # initial_data потому что нету в модели Bracket, а передается как дополнительное поле
         if validated_data.get('type') == 'SE':
-            single_el = SingleEl(clear_participants(validated_data.get('participants')), json.loads(self.initial_data.get('secod_final')))
-            bracket = single_el.create_se_bracket()
+            single_el = SingleEl(clear_participants(self.initial_data.get('participants')), json.loads(self.initial_data.get('secod_final')))
+            bracket = Bracket.objects.create(bracket=single_el.create_se_bracket(), type=validated_data.get('type'))
         elif validated_data.get('type') == 'RR':
-            round_robin = RoundRobin(clear_participants(self.initial_data.get('participants')))
+            round_robin = RoundRobin(clear_participants(self.initial_data.get('participants')), 
+            {'win': int(self.initial_data.get('points_victory')), 'loss': int(self.initial_data.get('points_loss')), 'draw': int(self.initial_data.get('points_draw'))})
             bracket = Bracket.objects.create(bracket=round_robin.create_round_robin_bracket(), type=validated_data.get('type'))
         elif validated_data.get('type') == 'DE':
-            double_el = DoubleEl(clear_participants(validated_data.get('participants')))
-            bracket = double_el.create_se_bracket()
+            double_el = DoubleEl(clear_participants(self.initial_data.get('participants')))
+            bracket = Bracket.objects.create(bracket=double_el.create_se_bracket(), type=validated_data.get('type'))
+           
         
         return bracket 
 

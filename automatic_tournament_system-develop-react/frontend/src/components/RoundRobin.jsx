@@ -11,7 +11,6 @@ const RoundRobin = ({id, bracket, owner}) => {
       setBracketAll(data)
       setTable(data.table)
     }
-    console.log(owner)
   
     return (
       <BracketWrapper>

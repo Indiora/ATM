@@ -11,7 +11,7 @@ export const SeedItem = styled.div`
 `;
 
 export const SeedTeam = styled.div`
-  background: #5e5555;
+ 
   padding: 0.2rem 0.5rem;
   display: flex;
   justify-content: space-between;

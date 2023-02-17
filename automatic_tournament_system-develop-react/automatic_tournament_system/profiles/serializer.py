@@ -78,7 +78,6 @@ class PasswordChangeSerializer(serializers.Serializer):
         return attrs
 
 
-
 class PasswordResetConfirmSerializer(serializers.Serializer):
     uid = serializers.CharField()
     token = serializers.CharField()

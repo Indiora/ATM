@@ -8,14 +8,14 @@ import MyMatch from "./UI/MyMatch/MyMatch";
 const DoubleEl = ({bracket, id, owner}) => {
     const [upperRounds, setUpperRounds] = useState(bracket.upper_rounds)
     const [lowerRounds, setLowerRounds] = useState(bracket.lower_rounds)
-    
+    // console.log(bracket)
     const [rounds, setBracket] = useState(bracket)
   
     const handleBracketChange = (data) => {
         setBracket(data)
     }
-
-    console.log(bracket)
+    
+    // console.log(bracket)
     // setB(rounds.shift())
 
       

@@ -4,42 +4,19 @@ import { useFetching } from '../hooks/useFetching'
 import Loader from '../components/UI/Loader/Loader'
 import PostService from "../API/PostService";
 import RoundRobin from '../components/RoundRobin';
-import { CustomDoubleElimination } from '../components/CustomDoubleElimination';
-import { CustomSingleEliminationBracket } from '../components/CustomSingleElimination';
-
+import SingleEl from '../components/SingleEl';
+import DoubleEl from '../components/DoubleEl';
+import BracketWrapper from '../components/UI/BracketWrapper/BracketWrapper';
 
 const Bracket = () => {
     const params = useParams()
-    const [bracket, setBracket] = useState({id: '', type: '', bracket: [{
-        "id": 1,
-        "nextMatchId": 0,
-        "tournamentRoundText": "test",
-        "startTime": "2021-05-30",
-        "state": "SCHEDULED",
-        "participants": [
-        {
-            "id": "d1",
-            "resultText": 0,
-            "isWinner": false,
-            "status": null,
-            "name": "not",
-            "picture": null
-        },
-        {
-            "id": "d1",
-            "resultText": 0,
-            "isWinner": false,
-            "status": null,
-            "name": "not",
-            "picture": null
-        }
-        ]
-    }]})
-
+    const [bracket, setBracket] = useState([])
+    const [type, setTypes] = useState('')
     const [fetchBrackets, isBraLoadind, braError] = useFetching(async (id) => {
         const response = await PostService.getBracketById(id)
-        setBracket(response.data)
-        console.log(response.data)
+        setBracket(response.data.bracket)
+        setTypes(response.data.type)
+        console.log(response.data.bracket)
     })
 
     useEffect(() => {
@@ -50,23 +27,26 @@ const Bracket = () => {
         <section>
             {isBraLoadind
                 ? <div className='loader'><Loader/></div>
-                :   <div className="container">
-                       {(() => {
-                                if (bracket.type === "SE") {
-                                    return (
-                                    
-                                    <CustomSingleEliminationBracket bracket={bracket.bracket}/>
-                                    )
-                                } else if (bracket.type === "RR") {
-                                    return (
-                                    <RoundRobin id={bracket.id} bracket={bracket.bracket}/>
-                                    )
-                                } else if (bracket.type === "DE") {
-                                    return (
-                                    <CustomDoubleElimination/>
-                                    )
-                                }
-                        })()}
+                :   <div className="container" style={{width: '1500px', height: '1000px'}}>
+                        <BracketWrapper >
+                        {(() => {
+                            
+                                    if (type === "SE") {
+                                        return (
+                                            <SingleEl id={params.id} bracket={bracket} owner={''}/>
+                                        )
+                                    } else if (type === "RR") {
+                                        return (
+                                            <RoundRobin id={params.id} bracket={bracket} owner={''}/>
+                                        )
+                                    } else if (type === "DE") {
+                                        
+                                        return (
+                                            <DoubleEl id={params.id} bracket={bracket} owner={''}/>
+                                        )
+                                    }
+                            })()}
+                        </BracketWrapper>
                     </div>
             
             }

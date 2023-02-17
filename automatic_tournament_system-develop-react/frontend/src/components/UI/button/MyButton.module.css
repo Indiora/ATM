@@ -1,5 +1,10 @@
 
 
+.myBtn {
+    color: inherit !important;
+}
+
+
 .myBtn:focus {
     color: inherit !important;
     text-shadow: none;

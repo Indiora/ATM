@@ -160,11 +160,11 @@ const CreateTournament = () => {
                   </Form.Group>
                   {responseBody.type === "SE"
                       ? 
-                      <Form.Check type='checkbox'>
-                        <Form.Check.Input name='secod_final'
-                        onChange={(e)=>inputCheckBoxChangeHandler(e)} className='my_ckeckbox' type='checkbox'/>
-                        <Form.Check.Label style={{color: 'inherit'}}>{`Include a match for 3rd place between semifinal losers`}</Form.Check.Label>
-                      </Form.Check>
+                        <Form.Check type='checkbox'>
+                          <Form.Check.Input name='secod_final'
+                          onChange={(e)=>inputCheckBoxChangeHandler(e)} className='my_ckeckbox' type='checkbox'/>
+                          <Form.Check.Label style={{color: 'inherit'}}>{`Include a match for 3rd place between semifinal losers`}</Form.Check.Label>
+                        </Form.Check>
                       : <></>
                   }
                   {responseBody.type === "RR"
