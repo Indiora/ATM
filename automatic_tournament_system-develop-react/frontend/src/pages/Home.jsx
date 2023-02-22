@@ -12,15 +12,14 @@ const Home = () => {
           <div className="col-lg-8 col-md-12">
             <div className="row">
               <div className="col position-absolute top-50 start-0 translate-middle-y">
-                <a href="/create_tournament" className='m-5' style={{fontSize: '1.75rem'}}>Create Tournament</a>
-                <a href="/create_bracket" style={{fontSize: '1.75rem'}}>Try Bracket Generator</a>
+                <a href="/create_tournament" className='m-5 main-link'>Create Tournament</a>
+                <a href="/create_bracket" className='main-link'>Try Bracket Generator</a>
               </div>
             </div>
           </div>
           <div className="col-lg-2"></div>
         </div>
       </div>
-      <hr className='mb-5'></hr>
       <div className="container text-center mb-5">
           <h2 className='mb-5 pt-5'>Enjoy your game, we'll handle the rest</h2>
           <div className="row pb-5">

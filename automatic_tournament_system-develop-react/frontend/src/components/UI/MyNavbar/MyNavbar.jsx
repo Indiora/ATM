@@ -37,7 +37,7 @@ const MyNavbar = () => {
         <Navbar.Toggle aria-controls="navbarScroll">
           <span className="navbar-toggler-bar navbar-kebab" >~</span>
         </Navbar.Toggle>
-        <Navbar.Collapse id="navbarScroll" className={classes.nav_background}>
+        <Navbar.Collapse id="navbarScroll">
 
           <Nav
             className="me-auto  my-lg-0"

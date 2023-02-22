@@ -93,6 +93,7 @@ return (
               <span>{seed.teams[1].score}</span>
             </SeedTeam>
         </div>
+       
     </SeedItem>
     <div className={`${classes.buttonDiv} p-1`}>
         {user !== null && owner !== user.username
@@ -231,6 +232,7 @@ return (
           <span>{seed.teams[1].score}</span>
         </SeedTeam>
     </div>
+    
 </SeedItem>
 <div className={`${classes.buttonDiv} p-1`}>
     {user !== null && owner == user.username

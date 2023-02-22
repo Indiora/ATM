@@ -79,7 +79,7 @@ const Tournament = () => {
                                                             ></path>
                                                         </svg>
                                                     </div>
-                                                :<img src={tournament.poster} className="pe-4 tournament_img" alt="card text"/>
+                                                :<img src={tournament.poster} className="pe-4 tournament-img" alt="card text"/>
                                             }
                                             {/* <img src={def_tour} alt="tournament poster" className="pe-4 tournament_img"/> */}
                                             {/* <img src={tournament.poster} alt="tournament poster" className="pe-4 tournament_img"/> */}

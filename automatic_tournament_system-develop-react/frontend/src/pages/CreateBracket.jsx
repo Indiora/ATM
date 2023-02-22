@@ -52,7 +52,7 @@ const CreateBracket = () => {
             <Form onSubmit={handleSubmit(onSubmitHandler)}>
                 <div className='my-4'>
                     <MyCard border="success">
-                        <Card.Header className='tournament_text'>Bracket info</Card.Header>
+                        <Card.Header className='tournament-text'>Bracket info</Card.Header>
                         <Card.Body>
                             <MyFormGroupInput
                                 label='Participants'

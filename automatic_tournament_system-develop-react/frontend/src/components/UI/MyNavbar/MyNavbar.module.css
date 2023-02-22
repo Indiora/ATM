@@ -1,17 +1,12 @@
 .nav_link {
-    color: inherit !important; 
+    color: var(--dark-ligth) !important; 
     padding-left: 0.35rem;
     padding-right: 0.35rem;
     padding-top: 0.75rem;
-    
 }
 
 .nav_link:hover {
     color: var(--highlight-color) !important; 
-}
-
-.nav_background {
-   
 }
 
 .my_navbar {
@@ -21,7 +16,6 @@
    
 }
 
-
 .my_drop {
     left: 45%;
     right: auto;
@@ -29,14 +23,18 @@
     border-width: 1px;
     transform: translateX(-45%);
     background: inherit;
-    color: inherit;
-    text-decoration-color: var(--green)  !important;
+    color: var(--dark-ligth);
+
+}
+
+.my_drop a {
+    color: var(--dark-ligth);
 }
 
 .my_toggle {
     border: none;
     background:  inherit !important;
-    color: var(--green) !important;
+    color: var(--opposite) !important;
 }
 
 .navbar_img {
@@ -49,90 +47,15 @@
         left: 50%;
         right: auto;
         transform: translateX(-0%);
-        background: rgb(25, 32, 36);
+        background: inherit;
         text-decoration-color: var(--green)  !important;
     }
-
-    .btn_circle {
-        width: 38px;
-        height: 38px;
-        border-radius: 19px;
-        text-align: center;
-        padding-left: 0;
-        padding-right: 0;
-        font-size: 16px;
-        color: var(--green) ;
-        background: var(--dark-second);
-        border-color: var(--green) ;
-        margin-top: 1em;
-        margin-bottom: 1em;
-        margin-right: 1em;
-    }
-  }
-
-
-.my_search_button {
-    border: none;
-    background: var(--green)  !important;
-    color: var(--dark);
-}
-
-.my_search_button:hover {
-    color: var(--highlight-color) !important; 
-}
-
-.my_form_input::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
-    color:  var(--green) ;
-    opacity: 1; /* Firefox */
-}
-
-.my_form_input:-ms-input-placeholder { /* Internet Explorer 10-11 */
-    color:  var(--green) ;
-}
-
-.my_form_input::-ms-input-placeholder { /* Microsoft Edge */
-    color:  var(--green) ;
-}
-
-.btn_circle {
-    width: 38px;
-    height: 38px;
-    border-radius: 19px;
-    text-align: center;
-    padding-left: 0;
-    padding-right: 0;
-    font-size: 16px;
-    color: var(--green) ;
-    background: var(--dark-second);
-    border-color: var(--green) ;
-    margin-left: 2em;
-    margin-right: 0.5em;
-} 
-
-.btn_circle:hover {
-   
-    color: var(--highlight-color);
-    border-color: var(--highlight-color);
- 
 }
 
 .svg_logo{
-    fill: var(--fill-color)
+    fill: var(--dark-ligth)
 }
 
 .svg_logo:hover{
     fill: var(--highlight-color)
-}
-.nav_item {
-    color: inherit;
-}
-
-.nav_item:hover {
-    background: inherit;
-}
-
-.nav_image {
-    margin-right: 0.25rem;
-    width: 75px;
-    height: 55px;
 }

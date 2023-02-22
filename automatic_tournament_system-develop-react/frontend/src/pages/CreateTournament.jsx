@@ -63,7 +63,7 @@ const CreateTournament = () => {
     <section className='section_without_div pt-4'>
     <Form onSubmit={handleSubmit(onSubmitHandler)}>
       <MyCard>
-          <Card.Header className='tournament_text'>Basic Info</Card.Header>
+          <Card.Header className='tournament-text'>Basic Info</Card.Header>
           <Card.Body>
               <MyFormGroupInput
                   label='Title'
@@ -130,7 +130,7 @@ const CreateTournament = () => {
       </MyCard>
       <div className='my-4'>
         <MyCard>
-            <Card.Header className='tournament_text'>Bracket Info</Card.Header>
+            <Card.Header className='tournament-text'>Bracket Info</Card.Header>
             <Card.Body>
                 <MyFormGroupInput
                     label='Participants'

@@ -76,17 +76,7 @@ const Profile = () => {
                     <p></p>
                   <p>With us since {moment(profile.user.date_joined).format('MMMM Do YYYY') || ''}</p>
                 </div>
-                {/* <div className="d-flex m-4">
-                  <img src={profile.user_icon} alt="user profile picture" className="profile-icon"/>
-                  <h4>{profile.user.username}</h4>
-                    <p></p>
-                  <p>With us since {moment(profile.user.date_joined).format('MMMM Do YYYY') || ''}</p>
-                  <div className="d-flex flex-column ps-4 pt-3">  
-                    <h4>{profile.user.username}</h4>
-                    <p></p>
-                    <p>With us since {moment(profile.user.date_joined).format('MMMM Do YYYY') || ''}</p>
-                  </div>
-                </div> */}
+              
             </div>
                 <div className='mb-3'>
                   <div className='d-grid'>
