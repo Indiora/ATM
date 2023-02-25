@@ -56,7 +56,7 @@ function Tournaments() {
                    
                 </Col>
             </Row>
-            <div ref={lastElement} className="scrool_div"></div>
+            <div ref={lastElement} className="invisible-div"></div>
             {isPostLoadind &&
                         <div className='loader'>
                             <Loader/>

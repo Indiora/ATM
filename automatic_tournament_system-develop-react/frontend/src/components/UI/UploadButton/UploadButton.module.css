@@ -1,18 +1,17 @@
 .myBtn {
     color: var(--dark) !important;
-    background: var(--green);
+    background: var(--highlight-color);
     text-decoration: none;
+    outline: none;
 }
 
-.myBtn:focus {
-    color: var(--dark) !important;
-    text-shadow: none;
-    box-shadow: none;
+.outLineMyBtn {
+    color: var(--highlight-color);
+    border: 1px solid var(--highlight-color);
     text-decoration: none;
+    outline: none;
 }
 
-.myBtn:hover {
-    color: var(--green);
-    background:  var(--dark-ligth-green);
-    box-shadow: 0 .5rem 1rem  var(--dark-ligth-green);
+.outLineMyBtn:hover {
+    color: var(--highlight-color);
 }

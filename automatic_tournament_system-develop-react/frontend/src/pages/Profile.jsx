@@ -84,7 +84,7 @@ const Profile = () => {
                       onClick={() => setOpenTournaments(!openTournaments)}  
                       aria-controls="example-collapse-text"
                       aria-expanded={openTournaments}
-                      style={{margin: 'auto', fontSize: '1.5rem', }}
+                      style={{margin: 'auto', fontSize: '1.5rem', cursor: 'pointer'}}
                     >
                       Tournaments
                     </a>
@@ -110,7 +110,7 @@ const Profile = () => {
                     <div id="example-collapse-text">
                     <Form onSubmit={handleImageChangeSubmit} className='my-4'>
                       <MyCard border="success" style={{width: '80%'}}>
-                          <Card.Header className='tournament_text'>Avatar</Card.Header>
+                          <Card.Header className='card-header-text'>Avatar</Card.Header>
                           <Card.Body>
                             <Form.Group className="mb-3">
                               <UploadButton setInputFileValue={setInputFile} />
@@ -139,7 +139,7 @@ const Profile = () => {
                     <div id="example-collapse-text">
                     <Form onSubmit={handlePasswordChangeSubmit} className='my-4'>
                       <MyCard style={{width: '80%'}}>
-                          <Card.Header>Change password</Card.Header>
+                          <Card.Header className='card-header-text'>Change password</Card.Header>
                           <Card.Body>
                         
                               <MyFormGroupInput

@@ -1,19 +1,19 @@
 import React from 'react'
 import MyButton from '../components/UI/button/MyButton';
 import '../styles/App.css';
-import Card from 'react-bootstrap/Card';
+
 
 const Home = () => {
   return (
     <section className="">
-      <div className="container-fluid home_div">
+      <div className="container-fluid home-div">
         <div className="row ">
           <div className="col-lg-2"></div>
           <div className="col-lg-8 col-md-12">
             <div className="row">
               <div className="col position-absolute top-50 start-0 translate-middle-y">
-                <a href="/create_tournament" className='m-5 main-link'>Create Tournament</a>
-                <a href="/create_bracket" className='main-link'>Try Bracket Generator</a>
+                <a href="/create_tournament" className='m-5 main-link'><big>Create Tournament</big></a>
+                <a href="/create_bracket" className='main-link'><big>Try Bracket Generator</big></a>
               </div>
             </div>
           </div>
@@ -160,7 +160,7 @@ const Home = () => {
           <p>
             We aim to keep things simple, but there's plenty more to explore in your website.
           </p> 
-          <button className='btn pb-5'><a href="/register"><h5>Sign up</h5></a></button>
+          <MyButton className='btn pb-5'><a href="/register"><h5>Sign up</h5></a></MyButton>
       </div>
     </section>
   )

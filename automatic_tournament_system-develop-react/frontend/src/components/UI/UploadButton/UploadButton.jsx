@@ -28,10 +28,10 @@ function UploadButton(props) {
         type="file"
       />
       <button
-        type="button"
+        type="button"  
         onClick={handleUpload}
         className={`btn ${
-          uploadedFileName ? `${classes.myBtn}` : "btn-outline-success"
+          uploadedFileName ? `${classes.myBtn}` : `${classes.outLineMyBtn}`
         }`}
       >
         {uploadedFileName ? uploadedFileName : "Upload"}

@@ -18,8 +18,10 @@ const CreateTournament = () => {
   const navigate = useNavigate()
   const { user } = useContext(AuthContext);
   const [responseBody, setResponseBody] = useState({title: '', content: '', start_time: '', participants: '', game: '', prize: '',
-                                                    type: 'SE', points_loss: '0', points_draw: '0', secod_final: false, points_victory: '1', creater_email: user.email});
+                                                    type: 'SE', points_loss: '0', points_draw: '0', secod_final: false, points_victory: '1',
+                                                    tournamentType: '1', creater_email: user.email});
   const [inputFile, setInputFile] = useState(null);
+  const [tournamentType, setTournamentType] = useState('0');
 
   const inputChangeHandler = (inputValue) => {
       const {name, value} = inputValue
@@ -29,6 +31,12 @@ const CreateTournament = () => {
   const inputSelectChangeHandler = (event) => {
     const {name, value} = event.target
     setResponseBody({...responseBody, [name]: value})
+  }
+
+  const inputRadioChangeHandler = (event) => {
+    const {name, value} = event.target
+    setTournamentType(event.target.value)
+    setResponseBody({...responseBody, [name]: tournamentType})
   }
 
   const inputCheckBoxChangeHandler = (e) => {
@@ -63,7 +71,7 @@ const CreateTournament = () => {
     <section className='section_without_div pt-4'>
     <Form onSubmit={handleSubmit(onSubmitHandler)}>
       <MyCard>
-          <Card.Header className='tournament-text'>Basic Info</Card.Header>
+          <Card.Header className='card-header-text'>Basic Info</Card.Header>
           <Card.Body>
               <MyFormGroupInput
                   label='Title'
@@ -126,11 +134,34 @@ const CreateTournament = () => {
                   <Form.Label>Poster</Form.Label>
                   <UploadButton setInputFileValue={setInputFile} />
               </Form.Group>
+              <p>Tournament type</p>
+              <div className="mb-3">
+              <Form.Check
+                inline
+                label="One stage"
+                name="tournamentType"
+                type='radio'
+                value='0'
+                checked={tournamentType == '0' ? true : false}
+                onChange={(event)=>{inputRadioChangeHandler(event)}}
+              >
+              </Form.Check>
+              <Form.Check
+                inline
+                label="Group two stage"
+                name="tournamentType"
+                type='radio'
+                value='1'
+                checked={tournamentType == '1' ? true : false}
+                onChange={(event)=>{inputRadioChangeHandler(event)}}
+              >
+              </Form.Check>
+            </div>
           </Card.Body>
       </MyCard>
       <div className='my-4'>
         <MyCard>
-            <Card.Header className='tournament-text'>Bracket Info</Card.Header>
+            <Card.Header className='card-header-text'>Bracket Info</Card.Header>
             <Card.Body>
                 <MyFormGroupInput
                     label='Participants'
@@ -150,7 +181,7 @@ const CreateTournament = () => {
                   <Form.Group className="mb-3">
                   <Form.Label>Bracket type</Form.Label>
                   <Form.Select 
-                      className='shadow-none' 
+                      className='shadow-none select-input' 
                       name='type' 
                       onChange={(e)=>inputSelectChangeHandler(e)}>
                       <option value="SE">Single Elimination</option>

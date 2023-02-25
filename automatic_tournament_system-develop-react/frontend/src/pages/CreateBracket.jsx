@@ -52,7 +52,7 @@ const CreateBracket = () => {
             <Form onSubmit={handleSubmit(onSubmitHandler)}>
                 <div className='my-4'>
                     <MyCard border="success">
-                        <Card.Header className='tournament-text'>Bracket info</Card.Header>
+                        <Card.Header className='card-header-text'>Bracket info</Card.Header>
                         <Card.Body>
                             <MyFormGroupInput
                                 label='Participants'
@@ -72,7 +72,7 @@ const CreateBracket = () => {
                             <Form.Group className="mb-3">
                                 <Form.Label>Bracket type</Form.Label>
                                 <Form.Select 
-                                className='shadow-none' 
+                                className='shadow-none select-input' 
                                 name='type' 
                                 onChange={(e)=>inputSelectChangeHandler(e)}>
                                     <option value="SE">Single Elimination</option>

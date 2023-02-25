@@ -24,8 +24,8 @@ const TournamentList = ({tournaments}) => {
                                     ? <div style={{height: '10rem', textAlign: 'center'}}>
                                         <svg
                                             xmlns="http://www.w3.org/2000/svg"
-                                            width="10rem"
-                                            height="10rem"
+                                            width="9rem"
+                                            height="9rem"
                                             version="1"
                                             className='my_svg'
                                             viewBox="0 0 300 300">
