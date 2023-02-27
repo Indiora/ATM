@@ -3,7 +3,7 @@ import math
 import secrets
 
 
-def clear_participants(participants) -> list:
+def clear_participants(participants: list) -> list:
     return [i.strip() for i in re.split(r'[\n\r]+', participants)]
 
 
@@ -11,125 +11,126 @@ def clear_participants(participants) -> list:
     
 class RoundRobin:
 
-    def __init__(self, participants, points):
+    def __init__(self, participants: list, points: dict) -> None:
         self.participants = [self.append_participant(name) for name in participants]
         self.match_table = [self.append_participant_to_table(name) for name in participants]
         self.points = points
 
     @staticmethod
-    def set_match_score(match, bracket):
-        # search round
-        for round in bracket.get('rounds'):
-            # search match 
-            for index, m in enumerate(round):
-                if m['id'] == match['id']:
-                    first_partic_res = int(match.get('participants')[0].get('resultText')) - int(m.get('participants')[0].get('resultText'))
-                    second_partic_res = int(match.get('participants')[1].get('resultText')) - int(m.get('participants')[1].get('resultText'))
-                    # generators search participant in table
-                    first_partic = next(partic for partic in bracket.get('table') if partic['participant'] == match.get('participants')[0].get('participant'))
-                    second_partic = next(partic for partic in bracket.get('table') if partic['participant'] == match.get('participants')[1].get('participant'))
-                    # add match scoore to table 
-                    first_partic.get('match_w_l')[0] += first_partic_res
-                    first_partic.get('match_w_l')[1] += second_partic_res
-                    second_partic.get('match_w_l')[0] += second_partic_res
-                    second_partic.get('match_w_l')[1] += first_partic_res
-                    # S -> P
-                    if match.get('state') == "PLAYED" and m.get('state') == 'SCHEDULED':
-                        match['state'] = "PLAYED"
-                        if first_partic_res > second_partic_res:
-                            # add res in table
-                            first_partic['win'] += 1
-                            second_partic['loose'] += 1
-                        elif second_partic_res > first_partic_res:
-                             # add res in table
-                            second_partic['win'] += 1
-                            first_partic['loose'] += 1
-                        elif second_partic_res == 0 and first_partic_res == 0:
-                            if int(match.get('participants')[0].get('resultText')) - int(match.get('participants')[1].get('resultText')) < 0:
-                                second_partic['win'] += 1
-                                first_partic['loose'] += 1
-                            elif int(match.get('participants')[0].get('resultText')) - int(match.get('participants')[1].get('resultText')) > 0:
-                                first_partic['win'] += 1
-                                second_partic['loose'] += 1
-                            else:
-                                second_partic['draw'] += 1
-                                first_partic['draw'] += 1
-                        else:
-                            second_partic['draw'] += 1
-                            first_partic['draw'] += 1
-                    # P -> S
-                    elif match.get('state') == "SCHEDULED" and m.get('state') == 'PLAYED':
-                        match['state'] = "SCHEDULED"
-                        if  m.get('participants')[0]['isWinner'] == True:
-                            # add res in table
-                            first_partic['win'] -= 1
-                            second_partic['loose'] -= 1
-                        elif m.get('participants')[1]['isWinner'] == True:
-                             # add res in table
-                            second_partic['win'] -= 1
-                            first_partic['loose'] -= 1
-                        else:
-                            second_partic['draw'] -= 1
-                            first_partic['draw'] -= 1
-                    # P -> P
-                    elif match.get('state') == "PLAYED" and m.get('state') == 'PLAYED':
-                          # d -> 1
-                        if m.get('participants')[0]['isWinner'] == False and \
-                            m.get('participants')[1]['isWinner'] == False and match.get('participants')[0]['isWinner']==True:
-                            first_partic['win'] += 1
-                            first_partic['draw'] -= 1
-                            second_partic['draw'] -= 1
-                            second_partic['loose'] += 1
-                        # d -> 2
-                        elif m.get('participants')[0]['isWinner'] == False and \
-                            m.get('participants')[1]['isWinner'] == False and match.get('participants')[1]['isWinner']==True:
-                            second_partic['win'] += 1
-                            second_partic['draw'] -= 1
-                            first_partic['draw'] -= 1
-                            first_partic['loose'] += 1
-                        # 2 -> 1
-                        elif match.get('participants')[0]['isWinner'] == True and m.get('participants')[0]['isWinner']==False:
-                            first_partic['win'] += 1
-                            first_partic['loose'] -= 1
-                            second_partic['loose'] += 1
-                            second_partic['win'] -= 1
-                        # 1 -> 2
-                        elif match.get('participants')[1]['isWinner'] == True and m.get('participants')[1]['isWinner']==False:
-                            second_partic['win'] += 1
-                            second_partic['loose'] -= 1
-                            first_partic['loose'] += 1
-                            first_partic['win'] -= 1
-                        # 1 -> d
-                        elif match.get('participants')[0]['isWinner'] == False and \
-                            match.get('participants')[1]['isWinner'] == False and m.get('participants')[0]['isWinner']==True:
-                            first_partic['win'] -= 1
-                            first_partic['draw'] += 1
-                            second_partic['draw'] += 1
-                            second_partic['loose'] -= 1
-                         # 2 -> d
-                        elif match.get('participants')[0]['isWinner'] == False and \
-                            match.get('participants')[1]['isWinner'] == False and m.get('participants')[1]['isWinner']==True:
-                            second_partic['win'] -= 1
-                            second_partic['draw'] += 1
-                            first_partic['draw'] += 1
-                            first_partic['loose'] -= 1
+    def set_match_score(match: dict, bracket) -> None:
+        round_id = match.get('round_id')
+        match_id = match.get('match_id')
 
-                    # get score from table
-                    win_scoore = bracket.get('points').get('win')
-                    loos_scoore = bracket.get('points').get('loss')
-                    draw_scoore = bracket.get('points').get('draw')
+        prev_match_state = bracket.get('rounds')[round_id][match_id]
+        first_partic_res = int(match.get('participants')[0].get('resultText')) - int(prev_match_state.get('participants')[0].get('resultText'))
+        second_partic_res = int(match.get('participants')[1].get('resultText')) - int(prev_match_state.get('participants')[1].get('resultText'))
+        
+        # generators search participant in table O(n)
+        first_partic = next(partic for partic in bracket.get('table') if partic['participant'] == match.get('participants')[0].get('participant'))
+        second_partic = next(partic for partic in bracket.get('table') if partic['participant'] == match.get('participants')[1].get('participant'))
+        # add match scoore to table 
+        first_partic.get('match_w_l')[0] += first_partic_res
+        first_partic.get('match_w_l')[1] += second_partic_res
+        second_partic.get('match_w_l')[0] += second_partic_res
+        second_partic.get('match_w_l')[1] += first_partic_res
+       
+        # S -> P
+        if match.get('state') == "PLAYED" and prev_match_state.get('state') == 'SCHEDULED':
+            match['state'] = "PLAYED"
+            if match.get('participants')[0].get('resultText') > match.get('participants')[1].get('resultText'):
+                # add res in table
+                first_partic['win'] += 1
+                second_partic['loose'] += 1
+            elif match.get('participants')[1].get('resultText') > match.get('participants')[0].get('resultText'):
+                # add res in table
+                second_partic['win'] += 1
+                first_partic['loose'] += 1
+            elif match.get('participants')[1].get('resultText') == 0 and match.get('participants')[0].get('resultText') == 0:
+                if int(match.get('participants')[0].get('resultText')) - int(match.get('participants')[1].get('resultText')) < 0:
+                    second_partic['win'] += 1
+                    first_partic['loose'] += 1
+                elif int(match.get('participants')[0].get('resultText')) - int(match.get('participants')[1].get('resultText')) > 0:
+                    first_partic['win'] += 1
+                    second_partic['loose'] += 1
+                else:
+                    second_partic['draw'] += 1
+                    first_partic['draw'] += 1
+            else:
+                second_partic['draw'] += 1
+                first_partic['draw'] += 1
+        # P -> S
+        elif match.get('state') == "SCHEDULED" and prev_match_state.get('state') == 'PLAYED':
+            match['state'] = "SCHEDULED"
+            if  prev_match_state.get('participants')[0]['isWinner'] == True:
+                # add res in table
+                first_partic['win'] -= 1
+                second_partic['loose'] -= 1
+            elif prev_match_state.get('participants')[1]['isWinner'] == True:
+                # add res in table
+                second_partic['win'] -= 1
+                first_partic['loose'] -= 1
+            else:
+                second_partic['draw'] -= 1
+                first_partic['draw'] -= 1
+        # P -> P
+        elif match.get('state') == "PLAYED" and prev_match_state.get('state') == 'PLAYED':
+            # d -> 1
+            if prev_match_state.get('participants')[0]['isWinner'] == False and \
+                prev_match_state.get('participants')[1]['isWinner'] == False and match.get('participants')[0]['isWinner']==True:
+                first_partic['win'] += 1
+                first_partic['draw'] -= 1
+                second_partic['draw'] -= 1
+                second_partic['loose'] += 1
+            # d -> 2
+            elif prev_match_state.get('participants')[0]['isWinner'] == False and \
+                prev_match_state.get('participants')[1]['isWinner'] == False and match.get('participants')[1]['isWinner']==True:
+                second_partic['win'] += 1
+                second_partic['draw'] -= 1
+                first_partic['draw'] -= 1
+                first_partic['loose'] += 1
+            # 2 -> 1
+            elif match.get('participants')[0]['isWinner'] == True and prev_match_state.get('participants')[0]['isWinner']==False:
+                first_partic['win'] += 1
+                first_partic['loose'] -= 1
+                second_partic['loose'] += 1
+                second_partic['win'] -= 1
+            # 1 -> 2
+            elif match.get('participants')[1]['isWinner'] == True and prev_match_state.get('participants')[1]['isWinner']==False:
+                second_partic['win'] += 1
+                second_partic['loose'] -= 1
+                first_partic['loose'] += 1
+                first_partic['win'] -= 1
+            # 1 -> d
+            elif match.get('participants')[0]['isWinner'] == False and \
+                match.get('participants')[1]['isWinner'] == False and prev_match_state.get('participants')[0]['isWinner']==True:
+                first_partic['win'] -= 1
+                first_partic['draw'] += 1
+                second_partic['draw'] += 1
+                second_partic['loose'] -= 1
+            # 2 -> d
+            elif match.get('participants')[0]['isWinner'] == False and \
+                match.get('participants')[1]['isWinner'] == False and prev_match_state.get('participants')[1]['isWinner']==True:
+                second_partic['win'] -= 1
+                second_partic['draw'] += 1
+                first_partic['draw'] += 1
+                first_partic['loose'] -= 1
 
-                    # calc for participants
-                    first_partic['scores'] = first_partic['draw']*draw_scoore + first_partic['win']*win_scoore + first_partic['loose']*loos_scoore
-                    second_partic['scores'] = second_partic['draw']*draw_scoore + second_partic['win']*win_scoore + second_partic['loose']*loos_scoore
-                   
-                    round[index] = match
-                    # leave function
-                    return
+        # get score from table
+        win_scoore = bracket.get('points').get('win')
+        loos_scoore = bracket.get('points').get('loss')
+        draw_scoore = bracket.get('points').get('draw')
+
+        # calc for participants
+        first_partic['scores'] = first_partic['draw']*draw_scoore + first_partic['win']*win_scoore + first_partic['loose']*loos_scoore
+        second_partic['scores'] = second_partic['draw']*draw_scoore + second_partic['win']*win_scoore + second_partic['loose']*loos_scoore
+
+        # delete round and match id
+        match.pop('round_id')
+        match.pop('match_id')
+        bracket.get('rounds')[round_id][match_id] = match
     
-    
 
-    def append_participant(self, name):
+    def append_participant(self, name: str) -> dict:
         return  {
                     'id': secrets.token_hex(16),
                     'resultText': 0,
@@ -137,7 +138,7 @@ class RoundRobin:
                     'isWinner': False
                 }
     
-    def append_participant_to_table(self, name):
+    def append_participant_to_table(self, name: str) -> dict:
         return  {
                     'id': secrets.token_hex(16),
                     'participant': f"{name}",
@@ -148,7 +149,7 @@ class RoundRobin:
                     'scores': 0
                 }
 
-    def create_round_robin_bracket(self):  
+    def create_round_robin_bracket(self) -> dict:  
         round_robin_bracket = []
         odd = True
         # if odd 
@@ -205,7 +206,7 @@ class SingleEl:
     def single_el_number_of_rounds(self) -> int:
         return math.ceil(math.log2(len(self.participants)))
 
-    def append_participant(self, name) -> dict:
+    def append_participant(self, name: str) -> dict:
         return  {
                     'id': secrets.token_hex(16),
                     'participant': f"{name}",
@@ -217,7 +218,7 @@ class SingleEl:
             return self.participants.pop()
         return self.append_participant('---')
 
-    def get_match(self, full=True) -> dict:
+    def get_match(self, full: bool=True) -> dict:
         if full:
             second_participant = self.get_participant()
         else:
@@ -366,14 +367,14 @@ class SingleEl:
 
 class DoubleEl:
 
-    def __init__(self, participants) -> None:
+    def __init__(self, participants: list) -> None:
         self.participants = [self.append_participant(name) for name in participants]
         self.length = len(participants)
 
     def single_el_number_of_rounds(self) -> int:
         return math.ceil(math.log2(len(self.participants)))
 
-    def append_participant(self, name) -> dict:
+    def append_participant(self, name: str) -> dict:
         return  {
                     'id': secrets.token_hex(16),
                     'participant': f"{name}",
@@ -385,7 +386,7 @@ class DoubleEl:
             return self.participants.pop()
         return self.append_participant('---')
 
-    def get_match(self, full=True) -> dict:
+    def get_match(self, full: bool=True) -> dict:
         if full:
             second_participant = self.get_participant()
         else:

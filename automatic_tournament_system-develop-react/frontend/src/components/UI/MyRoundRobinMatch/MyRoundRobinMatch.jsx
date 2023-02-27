@@ -10,7 +10,7 @@ import { AuthContext } from "../../../context";
 import moment from 'moment'
 
 
-const MyRoundRobinMatch = ({id, match, onPatch, owner}) => {
+const MyRoundRobinMatch = ({id, match, match_id, round_id, onPatch, owner}) => {
 
     const [modalShow, setMatchCardModalShow] = useState(false);
     const [modalEditShow, setEditMatchCardModalShow] = useState(false);
@@ -22,6 +22,9 @@ const MyRoundRobinMatch = ({id, match, onPatch, owner}) => {
     const [userTwoResult, setUserTwoResult] = useState(match.participants[1].resultText)
     const { user } = useContext(AuthContext);
     const api = useAxios()
+
+    console.log(round_id)
+    console.log(`match_id ${match_id}`)
 
     const {
         register,
@@ -78,13 +81,19 @@ const MyRoundRobinMatch = ({id, match, onPatch, owner}) => {
     }
     
     const onSubmitHandler = () => {
-        const response = api.patch(`/update_bracket/${id}/`,  { id: match.id, tournamentRoundText: "test", startTime: matchTime, state: matchState, 
-        participants: [
-           {id: match.participants[0].id, isWinner: userOneResult>userTwoResult && matchState=="PLAYED" ? true :false,
-            participant: userOne, picture: null, resultText: userOneResult},
-           {id: match.participants[1].id, isWinner: userOneResult<userTwoResult && matchState=="PLAYED" ? true :false,
-            participant: userTwo, picture: null, resultText: userTwoResult}
-       ] }).then(function(res){
+        const response = api.patch(`/update_bracket/${id}/`, 
+        { id: match.id,
+            tournamentRoundText: "test",
+            startTime: matchTime,
+            state: matchState, 
+            match_id: match_id, 
+            round_id: round_id,
+            participants: [
+            {id: match.participants[0].id, isWinner: userOneResult>userTwoResult && matchState=="PLAYED" ? true :false,
+                participant: userOne, picture: null, resultText: userOneResult},
+            {id: match.participants[1].id, isWinner: userOneResult<userTwoResult && matchState=="PLAYED" ? true :false,
+                participant: userTwo, picture: null, resultText: userTwoResult}
+        ] }).then(function(res){
             onPatch(res.data.bracket)
       })
        setEditMatchCardModalShow(false)
@@ -203,13 +212,13 @@ const MyRoundRobinMatch = ({id, match, onPatch, owner}) => {
                             </div>
                             <div className="row align-items-center mb-4">
                                 <div className={`col`} >  
-                                <input className={classes.myInput} onChange={e => inputUserOneResultHandler(e)} type="text" defaultValue={match.participants[0].resultText} />
+                                <input className={classes.myInput} onChange={e => inputUserOneResultHandler(e)} type="number" defaultValue={match.participants[0].resultText} />
                                 </div>
                                 <div className="col">
                                 <h4>VS</h4>
                                 </div>
                                 <div className="col">
-                                <input className={classes.myInput}  onChange={e => inputUserTwoResultHandler(e)} type="text" defaultValue={match.participants[1].resultText} />
+                                <input className={classes.myInput}  onChange={e => inputUserTwoResultHandler(e)} type="number" defaultValue={match.participants[1].resultText} />
                                 </div>
                             </div>
                             <p>Set State</p>

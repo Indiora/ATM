@@ -18,7 +18,7 @@ const MyMatch = ({id, seed, onPatch, owner, single=false}) => {
     const [userTwoResult, setUserTwoResult] = useState(seed.teams[1].score)
     const { user } = useContext(AuthContext);
     const api = useAxios()
-
+   
     const hoverOnMatch = (id) => {
       console.log('on')
       const elements = document.querySelectorAll(`[id=${id}]`);
