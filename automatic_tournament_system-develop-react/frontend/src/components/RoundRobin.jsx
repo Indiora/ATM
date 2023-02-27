@@ -20,7 +20,6 @@ const RoundRobin = ({id, bracket, owner}) => {
                   {round.map((match, j) => 
                     <MyRoundRobinMatch owner={owner} id={id} match={match} match_id={j} round_id={i} key={match.id} onPatch={handleBracketChange}/>
                   )}
-                     <p>hello</p>
                 </div> 
             )} 
         </div>

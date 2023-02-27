@@ -151,21 +151,24 @@ class RoundRobin:
 
     def create_round_robin_bracket(self) -> dict:  
         round_robin_bracket = []
-        odd = True
-        # if odd 
         if len(self.participants) % 2 == 1: 
             self.participants = self.participants + [self.append_participant('None')] 
-        else: 
-            odd=False
+            start = 1 if len(self.participants) // 2 != 1 else 0
+        else:
+            start = 0
+
         n = len(self.participants)
         map = list(range(n))
         mid = n // 2
+       
+        # O(n)
         for i in range(n-1):
             l1 = map[:mid]
             l2 = map[mid:]
             l2.reverse()
             round = []
-            for j in range(mid):
+            # O(n/2)
+            for j in range(start, mid):
                 t1 = self.participants[l1[j]]
                 t2 = self.participants[l2[j]]
                 if j == 0 and i % 2 == 1:
@@ -190,9 +193,7 @@ class RoundRobin:
                     })
             round_robin_bracket.append(round)
             map = map[mid:-1] + map[:mid] + map[-1:]
-        if odd:
-            for i in round_robin_bracket:
-                i.pop(0)
+            
         return {'rounds': round_robin_bracket, 'table': self.match_table, 'points': self.points}
     
 
