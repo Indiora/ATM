@@ -4,6 +4,7 @@ from .models import Tournament, Bracket
 
 class TournamentAdmin(admin.ModelAdmin):
     prepopulated_fields = {"slug": ("title",)}
+    list_display = ['id', 'title', 'created_at', ]
 
 
 class BracketAdmin(admin.ModelAdmin):
