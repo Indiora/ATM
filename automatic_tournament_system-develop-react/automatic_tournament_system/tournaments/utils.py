@@ -20,10 +20,13 @@ class RoundRobin:
     def set_match_score(match: dict, bracket) -> None:
         round_id = match.get('round_id')
         match_id = match.get('match_id')
-
         prev_match_state = bracket.get('rounds')[round_id][match_id]
-        first_partic_res = int(match.get('participants')[0].get('resultText')) - int(prev_match_state.get('participants')[0].get('resultText'))
-        second_partic_res = int(match.get('participants')[1].get('resultText')) - int(prev_match_state.get('participants')[1].get('resultText'))
+
+        current_first_res = int(match.get('participants')[0].get('resultText'))
+        current_second_res = int(match.get('participants')[1].get('resultText'))
+        
+        first_partic_res = current_first_res - int(prev_match_state.get('participants')[0].get('resultText'))
+        second_partic_res = current_second_res - int(prev_match_state.get('participants')[1].get('resultText'))
         
         # generators search participant in table O(n)
         first_partic = next(partic for partic in bracket.get('table') if partic['participant'] == match.get('participants')[0].get('participant'))
@@ -37,19 +40,19 @@ class RoundRobin:
         # S -> P
         if match.get('state') == "PLAYED" and prev_match_state.get('state') == 'SCHEDULED':
             match['state'] = "PLAYED"
-            if match.get('participants')[0].get('resultText') > match.get('participants')[1].get('resultText'):
+            if current_first_res > current_second_res:
                 # add res in table
                 first_partic['win'] += 1
                 second_partic['loose'] += 1
-            elif match.get('participants')[1].get('resultText') > match.get('participants')[0].get('resultText'):
+            elif current_second_res > current_first_res:
                 # add res in table
                 second_partic['win'] += 1
                 first_partic['loose'] += 1
-            elif match.get('participants')[1].get('resultText') == 0 and match.get('participants')[0].get('resultText') == 0:
-                if int(match.get('participants')[0].get('resultText')) - int(match.get('participants')[1].get('resultText')) < 0:
+            elif current_second_res == 0 and match.get('participants')[0].get('resultText') == 0:
+                if current_first_res - current_second_res < 0:
                     second_partic['win'] += 1
                     first_partic['loose'] += 1
-                elif int(match.get('participants')[0].get('resultText')) - int(match.get('participants')[1].get('resultText')) > 0:
+                elif current_first_res - current_second_res > 0:
                     first_partic['win'] += 1
                     second_partic['loose'] += 1
                 else:
@@ -193,7 +196,7 @@ class RoundRobin:
                     })
             round_robin_bracket.append(round)
             map = map[mid:-1] + map[:mid] + map[-1:]
-            
+
         return {'rounds': round_robin_bracket, 'table': self.match_table, 'points': self.points}
     
 
@@ -265,6 +268,7 @@ class SingleEl:
                             # rollback
                             cur_i = m_index
                             # from the current round to the end
+                            # O(log(n))
                             for i in range(r_index, len(bracket)-1):
                                 if cur_i % 2 == 0:
                                     cur_i = cur_i - (cur_i // 2) 
@@ -331,6 +335,7 @@ class SingleEl:
 
             # create firs round
             first_round = {'title': 0, 'seeds': []}
+            # O(n)
             for j in range(int(number_of_match)):
                 if full_first > 0:
                     first_round.get('seeds').append(self.get_match())
@@ -343,20 +348,25 @@ class SingleEl:
           
             # create second round
             second_round = {'title': 1, 'seeds': []}
+            # O(n)
             for j in range(int(number_of_match / 2 )):
                 second_round.get('seeds').append(self.get_match())
                  
             rounds.append(second_round)
           
             if nummber_of_rounds > 2:
+                # O(log(n))
                 for i in range(2, nummber_of_rounds):
                     round = {'title': i+1, 'seeds': []}
+                    # O(n)
                     for j in range(int(number_of_match / 2**i )):
                         round.get('seeds').append(self.get_match())
                     rounds.append(round)
         else:
+            # O(log(n))
             for i in range(1, nummber_of_rounds+1):
                 round = {'title': i, 'seeds': []}
+                # O(n)
                 for j in range(int(number_of_match / 2**i )):
                     round.get('seeds').append(self.get_match())
                 rounds.append(round)
@@ -414,6 +424,7 @@ class DoubleEl:
                     if prev_match.get('state')  == "PLAYED" and current_match.get('state')  == "SCHEDULED":
                         cur_i = m_index
                         # from the current round to the end
+                        # O(log(n))
                         for i in range(r_index, len(bracket['upper_rounds'])-1):
                             if cur_i % 2 == 0:
                                 cur_i = cur_i - (cur_i // 2) 
