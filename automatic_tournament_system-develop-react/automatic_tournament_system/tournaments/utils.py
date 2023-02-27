@@ -239,82 +239,90 @@ class SingleEl:
         
     @staticmethod
     def set_match_score(current_match, bracket) -> None:
-        # search round
-        for r_index, round in enumerate(bracket):
-            # search match
-            for m_index, prev_match in enumerate(round['seeds']):
-                if prev_match.get('id') == current_match.get('id'):
-                    round['seeds'][m_index] = current_match
-                    # P -> S
-                    if prev_match.get('state')  == "PLAYED" and current_match.get('state')  == "SCHEDULED":
-                        cur_i = m_index
-                        # from the current round to the end
-                        for i in range(r_index, len(bracket)-1):
-                            if cur_i % 2 == 0:
-                                cur_i = cur_i - (cur_i // 2) 
-                                team_index = 0
-                            else:
-                                cur_i = cur_i - (cur_i // 2) - 1
-                                team_index = 1
-                            bracket[i+1]['seeds'][cur_i]['state'] = "SCHEDULED"
-                            bracket[i+1]['seeds'][cur_i]['teams'][team_index]['participant']  = "---"
-                            bracket[i+1]['seeds'][cur_i]['teams'][team_index]['score']  = 0
-                            bracket[i+1]['seeds'][cur_i]['teams'][team_index]['id'] = secrets.token_hex(16)
-                    # P -> P
-                    elif prev_match.get('state')  == "PLAYED" and current_match.get('state')  == "PLAYED":
-                        current_winner =  1 if int(current_match['teams'][0]['score']) < int(current_match['teams'][1]['score'])  else 0
-                        prev_winner = 1 if int(prev_match['teams'][0]['score']) < int(prev_match['teams'][1]['score'])  else 0
-                        if current_winner != prev_winner:
-                            # rollback
-                            cur_i = m_index
-                            # from the current round to the end
-                            # O(log(n))
-                            for i in range(r_index, len(bracket)-1):
-                                if cur_i % 2 == 0:
-                                    cur_i = cur_i - (cur_i // 2) 
-                                    team_index = 0
-                                else:
-                                    cur_i = cur_i - (cur_i // 2) - 1
-                                    team_index = 1
-                                bracket[i+1]['seeds'][cur_i]['state'] = "SCHEDULED"
-                                bracket[i+1]['seeds'][cur_i]['teams'][team_index]['participant']  = "---"
-                                bracket[i+1]['seeds'][cur_i]['teams'][team_index]['score']  = 0
-                                bracket[i+1]['seeds'][cur_i]['teams'][team_index]['id'] = secrets.token_hex(16)
-                            # forward
-                            if bracket[r_index] != bracket[-1] and len(bracket[r_index]['seeds']) != len(bracket[-1]['seeds']):
-                                if m_index % 2 == 0:
-                                    match_index =  m_index - (m_index // 2)
-                                    team_index = 0
-                                else:
-                                    match_index = m_index - (m_index // 2) - 1
-                                    team_index = 1
-                                # check for second final
-                                if len(bracket[r_index+1]['seeds']) == len(bracket[r_index+2]['seeds']):
-                                    bracket[r_index+2]['seeds'][match_index]['teams'][team_index]['participant'] = current_match['teams'][current_winner-1]['participant']
-                                    bracket[r_index+2]['seeds'][match_index]['teams'][team_index]['id'] = current_match['teams'][current_winner-1]['id']
+        round_id = current_match.get('round_id')
+        match_id = current_match.get('match_id')
+        prev_match = bracket[round_id]['seeds'][match_id]
+        
+        current_match.pop('round_id')
+        current_match.pop('match_id')
+        bracket[round_id]['seeds'][match_id] = current_match
 
-                                bracket[r_index+1]['seeds'][match_index]['teams'][team_index]['participant'] = current_match['teams'][current_winner]['participant']
-                                bracket[r_index+1]['seeds'][match_index]['teams'][team_index]['id'] = current_match['teams'][current_winner]['id']
-                    # S -> P
-                    elif prev_match.get('state')  == "SCHEDULED" and current_match.get('state')  == "PLAYED": 
-                        winner =  1 if int(current_match['teams'][0]['score']) < int(current_match['teams'][1]['score'])  else 0
-                        if bracket[r_index] != bracket[-1] and len(bracket[r_index]['seeds']) != len(bracket[-1]['seeds']):
-                            print('vovk')
-                            if m_index % 2 == 0:
-                                match_index =  m_index - (m_index // 2)
-                                team_index = 0
-                            else:
-                                match_index = m_index - (m_index // 2) - 1
-                                team_index = 1
-                             # check for second final
-                            if len(bracket[r_index+1]['seeds']) == len(bracket[r_index+2]['seeds']):
-                                bracket[r_index+2]['seeds'][match_index]['teams'][team_index]['participant'] = current_match['teams'][winner-1]['participant']
-                                bracket[r_index+2]['seeds'][match_index]['teams'][team_index]['id'] = current_match['teams'][winner-1]['id']
+        # P -> S
+        if prev_match.get('state')  == "PLAYED" and current_match.get('state')  == "SCHEDULED":
+            cur_i = match_id
+            # from the current round to the end
+            for i in range(round_id, len(bracket)-1):
+                if cur_i % 2 == 0:
+                    cur_i = cur_i - (cur_i // 2) 
+                    team_index = 0
+                else:
+                    cur_i = cur_i - (cur_i // 2) - 1
+                    team_index = 1
+                if bracket[round_id] != bracket[-1] and bracket[round_id] != bracket[-2] and len(bracket[round_id+1]['seeds']) == len(bracket[round_id+2]['seeds']):
+                    team_index = 0 if match_id % 2 == 0 else 1
+                bracket[i+1]['seeds'][cur_i]['state'] = "SCHEDULED"
+                bracket[i+1]['seeds'][cur_i]['teams'][team_index]['participant']  = "---"
+                bracket[i+1]['seeds'][cur_i]['teams'][team_index]['score']  = 0
+                bracket[i+1]['seeds'][cur_i]['teams'][team_index-1]['score']  = 0
+                bracket[i+1]['seeds'][cur_i]['teams'][team_index]['id'] = secrets.token_hex(16)
+        # P -> P
+        elif prev_match.get('state')  == "PLAYED" and current_match.get('state')  == "PLAYED":
+            current_winner =  1 if int(current_match['teams'][0]['score']) < int(current_match['teams'][1]['score'])  else 0
+            prev_winner = 1 if int(prev_match['teams'][0]['score']) < int(prev_match['teams'][1]['score'])  else 0
+            if current_winner != prev_winner:
+                # rollback
+                cur_i = match_id
+                # from the current round to the end
+                # O(log(n))
+                for i in range(round_id, len(bracket)-1):
+                    if cur_i % 2 == 0:
+                        cur_i = cur_i - (cur_i // 2) 
+                        team_index = 0
+                    else:
+                        cur_i = cur_i - (cur_i // 2) - 1
+                        team_index = 1
+                    if bracket[round_id] != bracket[-1] and bracket[round_id] != bracket[-2] and len(bracket[round_id+1]['seeds']) == len(bracket[round_id+2]['seeds']):
+                        team_index = 0 if match_id % 2 == 0 else 1
+                    bracket[i+1]['seeds'][cur_i]['state'] = "SCHEDULED"
+                    bracket[i+1]['seeds'][cur_i]['teams'][team_index]['participant']  = "---"
+                    bracket[i+1]['seeds'][cur_i]['teams'][team_index]['score']  = 0
+                    bracket[i+1]['seeds'][cur_i]['teams'][team_index-1]['score']  = 0
+                    bracket[i+1]['seeds'][cur_i]['teams'][team_index]['id'] = secrets.token_hex(16)
+                # forward
+                if bracket[round_id] != bracket[-1] and len(bracket[round_id]['seeds']) != len(bracket[-1]['seeds']):
+                    if match_id % 2 == 0:
+                        match_index =  match_id - (match_id // 2)
+                        team_index = 0
+                    else:
+                        match_index = match_id - (match_id // 2) - 1
+                        team_index = 1
 
-                            bracket[r_index+1]['seeds'][match_index]['teams'][team_index]['participant'] = current_match['teams'][winner]['participant']
-                            bracket[r_index+1]['seeds'][match_index]['teams'][team_index]['id'] = current_match['teams'][winner]['id']
-                    # leave function
-                    return
+                    bracket[round_id+1]['seeds'][match_index]['teams'][team_index]['participant'] = current_match['teams'][current_winner]['participant']
+                    bracket[round_id+1]['seeds'][match_index]['teams'][team_index]['id'] = current_match['teams'][current_winner]['id']
+
+                    # check for second final
+                    if bracket[round_id] != bracket[-2] and len(bracket[round_id+1]['seeds']) == len(bracket[round_id+2]['seeds']):
+                        bracket[round_id+2]['seeds'][match_index]['teams'][team_index]['participant'] = current_match['teams'][current_winner-1]['participant']
+                        bracket[round_id+2]['seeds'][match_index]['teams'][team_index]['id'] = current_match['teams'][current_winner-1]['id']
+        # S -> P
+        elif prev_match.get('state')  == "SCHEDULED" and current_match.get('state')  == "PLAYED": 
+            winner =  1 if int(current_match['teams'][0]['score']) < int(current_match['teams'][1]['score'])  else 0
+            if bracket[round_id] != bracket[-1] and len(bracket[round_id]['seeds']) != len(bracket[-1]['seeds']):
+                print('S -> P')
+                if match_id % 2 == 0:
+                    match_index =  match_id - (match_id // 2)
+                    team_index = 0
+                else:
+                    match_index = match_id - (match_id // 2) - 1
+                    team_index = 1
+                    
+                bracket[round_id+1]['seeds'][match_index]['teams'][team_index]['participant'] = current_match['teams'][winner]['participant']
+                bracket[round_id+1]['seeds'][match_index]['teams'][team_index]['id'] = current_match['teams'][winner]['id']
+
+                # check for second final
+                if bracket[round_id] != bracket[-2] and len(bracket[round_id+1]['seeds']) == len(bracket[round_id+2]['seeds']):
+                    bracket[round_id+2]['seeds'][match_index]['teams'][team_index]['participant'] = current_match['teams'][winner-1]['participant']
+                    bracket[round_id+2]['seeds'][match_index]['teams'][team_index]['id'] = current_match['teams'][winner-1]['id']
 
 
     def create_se_bracket(self) -> list:
