@@ -23,9 +23,6 @@ const MyRoundRobinMatch = ({id, match, match_id, round_id, onPatch, owner}) => {
     const { user } = useContext(AuthContext);
     const api = useAxios()
 
-    console.log(round_id)
-    console.log(`match_id ${match_id}`)
-
     const {
         register,
         handleSubmit,

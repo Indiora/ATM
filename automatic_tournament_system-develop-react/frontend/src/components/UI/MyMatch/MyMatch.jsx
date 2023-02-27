@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { Seed, SeedItem, SeedTeam, SeedTime, SingleLineSeed } from "../seed";
 import classes from "./MyMatch.module.css";
 import MyModal from "../ MyModal/MyModal";
@@ -9,7 +9,8 @@ import { AuthContext } from "../../../context";
 import MyRadioButton from "../MyRadioButton/MyRadioButton";
 import moment from 'moment'
 
-const MyMatch = ({id, seed, onPatch, owner, single=false}) => {
+const MyMatch = ({id, seed, onPatch, match_id, round_id, owner, single=false}) => {
+
     const [modalShow, setMatchCardModalShow] = useState(false);
     const [modalEditShow, setEditMatchCardModalShow] = useState(false);
     const [matchState, setMatchState] = useState(seed.state)
@@ -18,7 +19,15 @@ const MyMatch = ({id, seed, onPatch, owner, single=false}) => {
     const [userTwoResult, setUserTwoResult] = useState(seed.teams[1].score)
     const { user } = useContext(AuthContext);
     const api = useAxios()
-   
+    console.log(`${round_id} ${matchState}`)
+
+    useEffect(()=>{
+        setMatchState(seed.state)
+        setUserOneResult(seed.teams[0].score)
+        setUserTwoResult(seed.teams[1].score)
+        setMatchTime(seed.startTime)
+    }, [seed])
+
     const hoverOnMatch = (id) => {
       console.log('on')
       const elements = document.querySelectorAll(`[id=${id}]`);
@@ -58,7 +67,12 @@ const MyMatch = ({id, seed, onPatch, owner, single=false}) => {
     }
 
     const onSubmitHandler = () => {
-      const response = api.patch(`/update_bracket/${id}/`,  { id: seed.id, startTime: matchTime, state: matchState, 
+      const response = api.patch(`/update_bracket/${id}/`,  
+      { id: seed.id,
+        startTime: matchTime,
+        state: matchState, 
+        match_id: match_id, 
+        round_id: round_id,
         teams: [
        {id: seed.teams[0].id, participant: seed.teams[0].participant,  score: userOneResult},
        {id: seed.teams[1].id, participant: seed.teams[1].participant,  score: userTwoResult},
@@ -256,13 +270,13 @@ return (
               </div>
               <div className="row align-items-center mb-4">
                   <div className={`col`} >  
-                    <input className={classes.myInput} onChange={e => inputUserOneResultHandler(e)} type="text" defaultValue={seed.teams[0].score} />
+                    <input className={classes.myInput} onChange={e => inputUserOneResultHandler(e)} type="text" defaultValue={userOneResult} />
                   </div>
                   <div className="col">
                     <h4>VS</h4>
                   </div>
                   <div className="col">
-                    <input className={classes.myInput}  onChange={e => inputUserTwoResultHandler(e)} type="text" defaultValue={seed.teams[1].score} />
+                    <input className={classes.myInput}  onChange={e => inputUserTwoResultHandler(e)} type="text" defaultValue={userTwoResult} />
                   </div>
               </div>
               <p>Set State</p>
