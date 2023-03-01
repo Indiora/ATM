@@ -262,8 +262,6 @@ class SingleEl:
                 if bracket[i] == bracket[-2] and len(bracket[-1]['seeds']) == len(bracket[-2]['seeds']):
                     # split the grid horizontally if at the bottom 1 otherwise 0
                     team_index = 1 if match_id >= len(bracket[round_id]['seeds']) // 2 else 0
-                    a = len(bracket[round_id]['seeds'])
-                    print(f'match_id {match_id} i {team_index}')
                 bracket[i+1]['seeds'][cur_i]['state'] = "SCHEDULED"
                 bracket[i+1]['seeds'][cur_i]['teams'][team_index]['participant']  = "---"
                 bracket[i+1]['seeds'][cur_i]['teams'][team_index]['score']  = 0
@@ -289,8 +287,6 @@ class SingleEl:
                     if bracket[i] == bracket[-2] and len(bracket[-1]['seeds']) == len(bracket[-2]['seeds']):
                         # split the grid horizontally if at the bottom 1 otherwise 0
                         team_index = 1 if match_id >= len(bracket[round_id]['seeds']) // 2 else 0
-                        a = len(bracket[round_id]['seeds'])
-                        print(f'match_id {match_id} i {a}')
                     bracket[i+1]['seeds'][cur_i]['state'] = "SCHEDULED"
                     bracket[i+1]['seeds'][cur_i]['teams'][team_index]['participant']  = "---"
                     bracket[i+1]['seeds'][cur_i]['teams'][team_index]['score']  = 0
@@ -616,6 +612,7 @@ class DoubleEl:
                     # P -> S
                     if prev_match.get('state')  == "PLAYED" and current_match.get('state')  == "SCHEDULED":
                         cur_i = m_index
+                        # rollback
                         # from the current round to the end
                         for i in range(r_index, len(bracket['lower_rounds'])-1):
                             if cur_i % 2 == 0:
@@ -627,12 +624,12 @@ class DoubleEl:
                             bracket['lower_rounds'][i+1]['seeds'][cur_i]['state'] = "SCHEDULED"
                             bracket['lower_rounds'][i+1]['seeds'][cur_i]['teams'][team_index]['participant']  = "---"
                             bracket['lower_rounds'][i+1]['seeds'][cur_i]['teams'][team_index]['score']  = 0
-                            # bracket['lower_rounds'][i+1]['seeds'][cur_i]['teams'][team_index-1]['score']  = 0
+                            bracket['lower_rounds'][i+1]['seeds'][cur_i]['teams'][team_index-1]['score']  = 0
                             bracket['lower_rounds'][i+1]['seeds'][cur_i]['teams'][team_index]['id'] = secrets.token_hex(16)
                         
-                        # check last
-                        lower_winner = 1 if int(current_match['teams'][0]['score']) < int(current_match['teams'][1]['score'])  else 0
-                        if bracket['upper_rounds'][-1]['seeds'][-1]['teams'][1]['id'] == current_match['teams'][lower_winner]['id']:
+                        # # check last
+                        # lower_winner = 1 if int(current_match['teams'][0]['score']) < int(current_match['teams'][1]['score'])  else 0
+                        # if bracket['upper_rounds'][-1]['seeds'][-1]['teams'][1]['id'] == current_match['teams'][lower_winner]['id']:
                             bracket['upper_rounds'][-1]['seeds'][-1]['state'] = "SCHEDULED"
                             bracket['upper_rounds'][-1]['seeds'][-1]['teams'][1]['participant'] = "---"
                             bracket['upper_rounds'][1]['seeds'][-1]['teams'][1]['score']  = 0
@@ -654,9 +651,9 @@ class DoubleEl:
                                 bracket['lower_rounds'][i+1]['seeds'][cur_i]['state'] = "SCHEDULED"
                                 bracket['lower_rounds'][i+1]['seeds'][cur_i]['teams'][team_index]['participant']  = "---"
                                 bracket['lower_rounds'][i+1]['seeds'][cur_i]['teams'][team_index]['score']  = 0
+                                bracket['lower_rounds'][i+1]['seeds'][cur_i]['teams'][team_index-1]['score']  = 0
                                 bracket['lower_rounds'][i+1]['seeds'][cur_i]['teams'][team_index]['id'] = secrets.token_hex(16)
-                            # check last
-                            if bracket['upper_rounds'][-1]['seeds'][-1]['teams'][1]['id'] == current_match['teams'][prev_winner]['id']:
+
                                 bracket['upper_rounds'][-1]['seeds'][-1]['state'] = "SCHEDULED"
                                 bracket['upper_rounds'][-1]['seeds'][-1]['teams'][1]['participant'] = "---"
                                 bracket['upper_rounds'][1]['seeds'][-1]['teams'][1]['score']  = 0
