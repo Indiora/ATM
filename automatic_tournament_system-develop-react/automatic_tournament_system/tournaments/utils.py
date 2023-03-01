@@ -258,8 +258,12 @@ class SingleEl:
                 else:
                     cur_i = cur_i - (cur_i // 2) - 1
                     team_index = 1
-                if bracket[round_id] != bracket[-1] and bracket[round_id] != bracket[-2] and len(bracket[round_id+1]['seeds']) == len(bracket[round_id+2]['seeds']):
-                    team_index = 0 if match_id % 2 == 0 else 1
+                # 3 round and double final
+                if bracket[i] == bracket[-2] and len(bracket[-1]['seeds']) == len(bracket[-2]['seeds']):
+                    # split the grid horizontally if at the bottom 1 otherwise 0
+                    team_index = 1 if match_id >= len(bracket[round_id]['seeds']) // 2 else 0
+                    a = len(bracket[round_id]['seeds'])
+                    print(f'match_id {match_id} i {team_index}')
                 bracket[i+1]['seeds'][cur_i]['state'] = "SCHEDULED"
                 bracket[i+1]['seeds'][cur_i]['teams'][team_index]['participant']  = "---"
                 bracket[i+1]['seeds'][cur_i]['teams'][team_index]['score']  = 0
@@ -281,8 +285,12 @@ class SingleEl:
                     else:
                         cur_i = cur_i - (cur_i // 2) - 1
                         team_index = 1
-                    if bracket[round_id] != bracket[-1] and bracket[round_id] != bracket[-2] and len(bracket[round_id+1]['seeds']) == len(bracket[round_id+2]['seeds']):
-                        team_index = 0 if match_id % 2 == 0 else 1
+                    # 3 round and double final
+                    if bracket[i] == bracket[-2] and len(bracket[-1]['seeds']) == len(bracket[-2]['seeds']):
+                        # split the grid horizontally if at the bottom 1 otherwise 0
+                        team_index = 1 if match_id >= len(bracket[round_id]['seeds']) // 2 else 0
+                        a = len(bracket[round_id]['seeds'])
+                        print(f'match_id {match_id} i {a}')
                     bracket[i+1]['seeds'][cur_i]['state'] = "SCHEDULED"
                     bracket[i+1]['seeds'][cur_i]['teams'][team_index]['participant']  = "---"
                     bracket[i+1]['seeds'][cur_i]['teams'][team_index]['score']  = 0
