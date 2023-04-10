@@ -3,7 +3,7 @@ import MySortebleTable from "./UI/MySortebleTable/MySortebleTable";
 import React, { useState} from "react";
 import BracketWrapper from "./UI/BracketWrapper/BracketWrapper";
 
-const RoundRobin = ({id, bracket, owner}) => {
+const Swiss = ({id, bracket, owner}) => {
     const [bracketAll, setBracketAll] = useState(bracket)
     const [table, setTable] = useState(bracket.table)
     
@@ -16,9 +16,9 @@ const RoundRobin = ({id, bracket, owner}) => {
       { label: "Participant", accessor: "participant", sortable: true },
       { label: "Match W-L", accessor: "match_w_l", sortable: false },
       { label: "Set win", accessor: "win", sortable: true },
-      { label: "Set loose", accessor: "loose", sortable: true }, 
+      { label: "Set loose", accessor: "loose", sortable: true },
       { label: "Set draw", accessor: "draw", sortable: true },
-      { label: "Berger", accessor: "berger", sortable: true },
+      { label: "Buchholz ", accessor: "buchholz", sortable: true },
       { label: "Scores", accessor: "scores", sortable: true, sortbyOrder: "desc" },
     ];
   
@@ -39,4 +39,4 @@ const RoundRobin = ({id, bracket, owner}) => {
   )
 };
 
-  export default RoundRobin;
+  export default Swiss;

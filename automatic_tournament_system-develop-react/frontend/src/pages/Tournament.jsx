@@ -11,6 +11,7 @@ import MyButton from '../components/UI/button/MyButton';
 import Accordion from 'react-bootstrap/Accordion';
 import moment from 'moment'
 import RoundRobin from '../components/RoundRobin';
+import Swiss from '../components/Swiss';
 import SingleEl from '../components/SingleEl';
 import DoubleEl from '../components/DoubleEl';
 
@@ -124,6 +125,10 @@ const Tournament = () => {
                                                             } else if (types == "DE") {
                                                                 return (
                                                                     <DoubleEl id={id} bracket={bracket} owner={tournament.owner}/>
+                                                                )
+                                                            } else if (types == "SW") {
+                                                                return (
+                                                                    <Swiss id={id} bracket={bracket} owner={tournament.owner}/>
                                                                 )
                                                             }
                                                         })()} </>

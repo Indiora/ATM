@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from .models import Tournament, Bracket
-from .utils import RoundRobin, SingleEl, DoubleEl, clear_participants
+from .utils import RoundRobin, SingleEl, DoubleEl, Swiss, clear_participants
 from profiles.models import Profile
 import json
 
@@ -25,7 +25,11 @@ class TournamentSerializer(serializers.ModelSerializer):
         elif self.initial_data.get('type') == 'DE':
             double_el = DoubleEl(clear_participants(validated_data.get('participants')))
             bracket = double_el.create_se_bracket()
-            
+        elif self.initial_data.get('type') == 'SW':
+            swiss = Swiss(clear_participants(self.initial_data.get('participants')),
+             {'win': int(self.initial_data.get('points_victory')), 'loss': int(self.initial_data.get('points_loss')), 'draw': int(self.initial_data.get('points_draw'))})
+            bracket = swiss.create_swiss_bracket()
+    
         tournament = Tournament.objects.create(**validated_data, owner=Profile.objects.get(user__email=self.initial_data.get('creater_email')))
         Bracket.objects.create(tournament=tournament, bracket=bracket, type=self.initial_data.get('type'))
         return tournament
@@ -48,6 +52,10 @@ class BracketSerializer(serializers.ModelSerializer):
         elif validated_data.get('type') == 'DE':
             double_el = DoubleEl(clear_participants(self.initial_data.get('participants')))
             bracket = Bracket.objects.create(bracket=double_el.create_se_bracket(), type=validated_data.get('type'))
+        elif validated_data.get('type') == 'SW':
+            swiss = Swiss(clear_participants(self.initial_data.get('participants')), 
+            {'win': int(self.initial_data.get('points_victory')), 'loss': int(self.initial_data.get('points_loss')), 'draw': int(self.initial_data.get('points_draw'))})
+            bracket = Bracket.objects.create(bracket=swiss.create_swiss_bracket(), type=validated_data.get('type'))
            
         
         return bracket 
@@ -59,6 +67,8 @@ class BracketSerializer(serializers.ModelSerializer):
             RoundRobin.set_match_score(self.initial_data, instance.bracket)
         elif instance.type == 'DE':
             DoubleEl.set_match_score(self.initial_data, instance.bracket)
+        elif instance.type == 'SW':
+            Swiss.set_match_score(self.initial_data, instance.bracket)
         return super().update(instance, validated_data)
 
 

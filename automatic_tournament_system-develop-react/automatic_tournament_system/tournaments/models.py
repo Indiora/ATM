@@ -45,6 +45,7 @@ class Bracket(models.Model):
         SINGLEELIMINATION = 'SE', _('Single elimination')
         DOUBLEELIMINATION = 'DE', _('Double elimination')
         ROUNDROBIN = 'RR', _('Round robin')
+        SWISS = 'SW', _('Swiss')
 
     type = models.CharField(
         max_length=255,

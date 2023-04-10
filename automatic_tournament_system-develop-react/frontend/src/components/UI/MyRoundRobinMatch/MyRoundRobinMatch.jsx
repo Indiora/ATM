@@ -87,9 +87,9 @@ const MyRoundRobinMatch = ({id, match, match_id, round_id, onPatch, owner}) => {
             round_id: round_id,
             participants: [
             {id: match.participants[0].id, isWinner: userOneResult>userTwoResult && matchState=="PLAYED" ? true :false,
-                participant: userOne, picture: null, resultText: userOneResult},
+                participant: match.participants[0].participant, picture: null, resultText: userOneResult},
             {id: match.participants[1].id, isWinner: userOneResult<userTwoResult && matchState=="PLAYED" ? true :false,
-                participant: userTwo, picture: null, resultText: userTwoResult}
+                participant: match.participants[1].participant, picture: null, resultText: userTwoResult}
         ] }).then(function(res){
             onPatch(res.data.bracket)
       })

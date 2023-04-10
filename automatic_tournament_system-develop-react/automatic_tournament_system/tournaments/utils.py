@@ -131,6 +131,21 @@ class RoundRobin:
         match.pop('round_id')
         match.pop('match_id')
         bracket.get('rounds')[round_id][match_id] = match
+
+        # Berger
+        # O(n/2 * log(n))
+        for count, i in enumerate(bracket.get('rounds')[0:round_id+1]):
+            for j in i:
+                # O(n)
+                first = next(partic for partic in bracket.get('table') if partic['participant'] == j.get('participants')[0].get('participant'))
+                second = next(partic for partic in bracket.get('table') if partic['participant'] == j.get('participants')[1].get('participant'))
+                if count == 0:
+                    first['berger'] = 0
+                    second['berger'] = 0
+                if j.get('participants')[0]['isWinner'] == True:
+                    first['berger'] += second['scores']
+                elif j.get('participants')[1]['isWinner'] == True:
+                    second['berger'] += first['scores']
     
 
     def append_participant(self, name: str) -> dict:
@@ -327,7 +342,6 @@ class SingleEl:
                 if bracket[round_id] != bracket[-2] and len(bracket[round_id+1]['seeds']) == len(bracket[round_id+2]['seeds']):
                     bracket[round_id+2]['seeds'][match_index]['teams'][team_index]['participant'] = current_match['teams'][winner-1]['participant']
                     bracket[round_id+2]['seeds'][match_index]['teams'][team_index]['id'] = current_match['teams'][winner-1]['id']
-
 
     def create_se_bracket(self) -> list:
         rounds = []
@@ -749,3 +763,260 @@ class DoubleEl:
             lower_rounds.append(round_2)
         
         return {'upper_rounds': upper_rounds, 'lower_rounds': lower_rounds}
+
+
+class Swiss:
+    def __init__(self, participants: list, points: dict) -> None:
+        self.participants = [self.append_participant(name) for name in participants]
+        self.match_table = [self.append_participant_to_table(name) for name in participants]
+        self.points = points
+
+    @staticmethod
+    def set_match_score(match: dict, bracket: list) -> None:
+        
+        round_id = match.get('round_id')
+        match_id = match.get('match_id')
+        prev_match_state = bracket.get('rounds')[round_id][match_id]
+
+        current_first_res = int(match.get('participants')[0].get('resultText'))
+        current_second_res = int(match.get('participants')[1].get('resultText'))
+        
+        first_partic_res = current_first_res - int(prev_match_state.get('participants')[0].get('resultText'))
+        second_partic_res = current_second_res - int(prev_match_state.get('participants')[1].get('resultText'))
+        
+       
+        # generators search participant in table O(n)
+        first_partic = next(partic for partic in bracket.get('table') if partic['participant'] == match.get('participants')[0].get('participant'))
+        if match.get('participants')[1].get('participant') != 'None':
+            second_partic = next(partic for partic in bracket.get('table') if partic['participant'] == match.get('participants')[1].get('participant'))
+        else:
+            second_partic = {'match_w_l': [0, 0], 'loose': 0, 'win': 0, 'draw': 0}
+        # add match scoore to table 
+        first_partic.get('match_w_l')[0] += first_partic_res
+        first_partic.get('match_w_l')[1] += second_partic_res
+        second_partic.get('match_w_l')[0] += second_partic_res
+        second_partic.get('match_w_l')[1] += first_partic_res
+        
+        # S -> P
+        if match.get('state') == "PLAYED" and prev_match_state.get('state') == 'SCHEDULED':
+            match['state'] = "PLAYED"
+            if current_first_res > current_second_res:
+                # add res in table
+                first_partic['win'] += 1
+                second_partic['loose'] += 1
+            elif current_second_res > current_first_res:
+                # add res in table
+                second_partic['win'] += 1
+                first_partic['loose'] += 1
+            elif current_second_res == 0 and match.get('participants')[0].get('resultText') == 0:
+                if current_first_res - current_second_res < 0:
+                    second_partic['win'] += 1
+                    first_partic['loose'] += 1
+                elif current_first_res - current_second_res > 0:
+                    first_partic['win'] += 1
+                    second_partic['loose'] += 1
+                else:
+                    second_partic['draw'] += 1
+                    first_partic['draw'] += 1
+            else:
+                second_partic['draw'] += 1
+                first_partic['draw'] += 1
+        # P -> S
+        elif match.get('state') == "SCHEDULED" and prev_match_state.get('state') == 'PLAYED':
+            match['state'] = "SCHEDULED"
+            if  prev_match_state.get('participants')[0]['isWinner'] == True:
+                # add res in table
+                first_partic['win'] -= 1
+                second_partic['loose'] -= 1
+            elif prev_match_state.get('participants')[1]['isWinner'] == True:
+                # add res in table
+                second_partic['win'] -= 1
+                first_partic['loose'] -= 1
+            else:
+                second_partic['draw'] -= 1
+                first_partic['draw'] -= 1
+        # P -> P
+        elif match.get('state') == "PLAYED" and prev_match_state.get('state') == 'PLAYED':
+            # d -> 1
+            if prev_match_state.get('participants')[0]['isWinner'] == False and \
+                prev_match_state.get('participants')[1]['isWinner'] == False and match.get('participants')[0]['isWinner']==True:
+                first_partic['win'] += 1
+                first_partic['draw'] -= 1
+                second_partic['draw'] -= 1
+                second_partic['loose'] += 1
+            # d -> 2
+            elif prev_match_state.get('participants')[0]['isWinner'] == False and \
+                prev_match_state.get('participants')[1]['isWinner'] == False and match.get('participants')[1]['isWinner']==True:
+                second_partic['win'] += 1
+                second_partic['draw'] -= 1
+                first_partic['draw'] -= 1
+                first_partic['loose'] += 1
+            # 2 -> 1
+            elif match.get('participants')[0]['isWinner'] == True and prev_match_state.get('participants')[0]['isWinner']==False:
+                first_partic['win'] += 1
+                first_partic['loose'] -= 1
+                second_partic['loose'] += 1
+                second_partic['win'] -= 1
+            # 1 -> 2
+            elif match.get('participants')[1]['isWinner'] == True and prev_match_state.get('participants')[1]['isWinner']==False:
+                second_partic['win'] += 1
+                second_partic['loose'] -= 1
+                first_partic['loose'] += 1
+                first_partic['win'] -= 1
+            # 1 -> d
+            elif match.get('participants')[0]['isWinner'] == False and \
+                match.get('participants')[1]['isWinner'] == False and prev_match_state.get('participants')[0]['isWinner']==True:
+                first_partic['win'] -= 1
+                first_partic['draw'] += 1
+                second_partic['draw'] += 1
+                second_partic['loose'] -= 1
+            # 2 -> d
+            elif match.get('participants')[0]['isWinner'] == False and \
+                match.get('participants')[1]['isWinner'] == False and prev_match_state.get('participants')[1]['isWinner']==True:
+                second_partic['win'] -= 1
+                second_partic['draw'] += 1
+                first_partic['draw'] += 1
+                first_partic['loose'] -= 1
+        
+        # get score from table
+        win_scoore = bracket.get('points').get('win')
+        loos_scoore = bracket.get('points').get('loss')
+        draw_scoore = bracket.get('points').get('draw')
+
+        # calc for participants
+        first_partic['scores'] = first_partic['draw']*draw_scoore + first_partic['win']*win_scoore + first_partic['loose']*loos_scoore
+        second_partic['scores'] = second_partic['draw']*draw_scoore + second_partic['win']*win_scoore + second_partic['loose']*loos_scoore
+
+        # delete round and match id
+        match.pop('round_id')
+        match.pop('match_id')
+        
+        bracket.get('rounds')[round_id][match_id] = match
+
+        
+        round_end = True
+        cur_round = bracket.get('rounds')[round_id]
+        
+        # O(log(n)) check all games in found played
+        for i in cur_round:
+            if i.get('state') != 'PLAYED':
+                round_end = False
+                break
+
+        # buchholz 
+        # O(n/2 * log(n))
+        for count, i in enumerate(bracket.get('rounds')[0:round_id+1]):
+            for j in i:
+                # O(n)
+                first = next(partic for partic in bracket.get('table') if partic['participant'] == j.get('participants')[0].get('participant'))
+                if j.get('participants')[1].get('participant') != 'None':
+                    second = next(partic for partic in bracket.get('table') if partic['participant'] == j.get('participants')[1].get('participant'))
+                    if count == 0:
+                        first['buchholz'] = 0
+                        second['buchholz'] = 0
+                    first['buchholz'] += second['scores']
+                    second['buchholz'] += first['scores']
+
+                elif count == 0:
+                    first['buchholz'] = 0
+
+                
+                
+                print(f'{j.get("participants")[0].get("participant")} {first["scores"]}')
+                print(f'{j.get("participants")[1].get("participant")} {second["scores"]}')
+
+        # new round
+        if round_end and round_id!= len(bracket.get('rounds')) - 1 and bracket.get('rounds')[round_id+1][0].get('participants')[0].get('participant') == 'TBO':
+            parts = sorted(bracket.get('table'), reverse=True, key=lambda partic: partic.get('scores'))
+            if len(parts) % 2 == 1:
+                parts.append({"id": secrets.token_hex(16), "participant": "None", "match_w_l": [0, 0], "draw": 0, "win": 0, "loose": 0, "scores": 0})
+            #O(n)
+            round = []
+            while len(parts) > 0:
+                previously_played = []
+                #O(n/2 * log(n))
+                for i in bracket.get('rounds'):
+                    for j in i:
+                        if parts[0].get('participant') == j.get('participants')[0].get('participant'):
+                            previously_played.append(j.get('participants')[1].get('participant'))
+                        elif parts[0].get('participant') == j.get('participants')[1].get('participant'):
+                            previously_played.append(j.get('participants')[0].get('participant'))
+                #O(n)
+                for index in range(1, len(parts)):
+                    if parts[index].get('participant') not in previously_played:
+
+                        t1 = {'id': parts[0].get('id'), 'resultText': 0, 'participant': parts[0].get('participant'), 'isWinner': False}
+                        parts.pop(0)
+                        t2 = {'id': parts[index-1].get('id'), 'resultText': 0, 'participant': parts[index-1].get('participant'), 'isWinner': False}
+                        parts.pop(index-1)
+                        round.append({
+                            "id": bracket.get('rounds')[round_id+1][0].get('id'),
+                            "startTime": bracket.get('rounds')[round_id+1][0].get('startTime'),
+                            "state": bracket.get('rounds')[round_id+1][0].get('state'),
+                            "participants": [
+                                t1,
+                                t2
+                            ]
+                            })
+                        break
+            bracket.get('rounds')[round_id+1] = round
+        return 
+    
+    def swiss_number_of_rounds(self) -> int:
+        return math.ceil(math.log2(len(self.participants)))
+
+    def append_participant(self, name: str) -> dict:
+        return  {
+                    'id': secrets.token_hex(16),
+                    'resultText': 0,
+                    'participant': f"{name}",
+                    'isWinner': False
+                }
+    
+    def append_participant_to_table(self, name: str) -> dict:
+        return  {
+                    'id': secrets.token_hex(16),
+                    'participant': f"{name}",
+                    'match_w_l': [0, 0],
+                    'draw': 0,
+                    'win': 0,
+                    'loose': 0,
+                    'scores': 0,
+                    'buchholz': 0,
+                }
+
+    def create_swiss_bracket(self) -> dict:  
+        swiss_bracket = []
+        if len(self.participants) % 2 == 1: 
+            self.participants = self.participants + [self.append_participant('None')] 
+        
+        # O(log(n))
+        for i in range(self.swiss_number_of_rounds()):
+            round = []
+            # O(n / 2)
+            for j in range(math.ceil(len(self.participants) / 2)):
+                if i == 0:
+                    t1 = self.participants[j]
+                    t2 = self.participants[len(self.participants) // 2 + j]
+                    round.append({
+                        "id": secrets.token_hex(16),
+                        "startTime": "2023-05-30",
+                        "state": "SCHEDULED",
+                        "participants": [
+                            t1,
+                            t2
+                        ]
+                        })
+                else:
+                    round.append({
+                        "id": secrets.token_hex(16),
+                        "startTime": "2023-05-30",
+                        "state": "SCHEDULED",
+                        "participants": [
+                            self.append_participant('TBO'),
+                            self.append_participant('TBO')
+                        ]
+                        })
+            swiss_bracket.append(round)
+
+        return {'rounds': swiss_bracket, 'table': self.match_table, 'points': self.points}

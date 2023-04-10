@@ -159,10 +159,130 @@ const CreateTournament = () => {
             </div>
           </Card.Body>
       </MyCard>
+
       <div className='my-4'>
         <MyCard>
             <Card.Header className='card-header-text'>Bracket Info</Card.Header>
             <Card.Body>
+
+                {tournamentType === '1'
+                    ? <>
+                        <div>
+                          <p>Group stage</p>
+                          <Form.Group className="mb-3">
+                            <Form.Label>Bracket type</Form.Label>
+                            <Form.Select 
+                                className='shadow-none select-input' 
+                                name='type1' 
+                                onChange={(e)=>inputSelectChangeHandler(e)}>
+                                <option value="SE">Single Elimination</option>
+                                <option value="DE">Double Elimination</option>
+                                <option value="RR">Round Robin</option>
+                                
+                            </Form.Select>
+                          </Form.Group>
+                          <div className='row'>
+                              <div className='col'>
+                                  <MyFormGroupInput
+                                      label='Compete in each group '
+                                      name='points_victory'
+                                      errors={errors}
+                                      defaultValue={1}
+                                      register={register}
+                                      validationSchema={{ 
+                                          required: "⚠ This input is required." 
+                                        }}
+                                      onChange={inputChangeHandler}>
+                                  </MyFormGroupInput>
+                              </div>
+                              <div className='col'>
+                                  <MyFormGroupInput
+                                      label='Advance from each group — power of 2 for single & double'
+                                      name='points_draw'
+                                      errors={errors}
+                                      defaultValue={0}
+                                      register={register}
+                                      validationSchema={{ 
+                                          required: "⚠ This input is required." 
+                                        }}
+                                      onChange={inputChangeHandler}>
+                                  </MyFormGroupInput>
+                              </div>
+                          </div>
+                        </div>
+                        <p>Final stage</p>
+                      </>
+                    : <></>
+                  }
+                  <Form.Group className="mb-3">
+                    <Form.Label>Bracket type</Form.Label>
+                    <Form.Select 
+                        className='shadow-none select-input' 
+                        name='type' 
+                        onChange={(e)=>inputSelectChangeHandler(e)}>
+                        <option value="SE">Single Elimination</option>
+                        <option value="DE">Double Elimination</option>
+                        <option value="RR">Round Robin</option>
+                        <option value="SW">Swiss</option>
+                    </Form.Select>
+                  </Form.Group>
+                  
+                  {responseBody.type === "SE"
+                      ? 
+                        <Form.Check type='checkbox'>
+                          <Form.Check.Input name='secod_final'
+                          onChange={(e)=>inputCheckBoxChangeHandler(e)} className='my_ckeckbox' type='checkbox'/>
+                          <Form.Check.Label style={{color: 'inherit'}}>{`Include a match for 3rd place between semifinal losers`}</Form.Check.Label>
+                        </Form.Check>
+                      : <></>
+                  }
+                  {responseBody.type === "RR" || responseBody.type === "SW"
+                      ? <>
+                          <div className='row'>
+                              <div className='col'>
+                                  <MyFormGroupInput
+                                      label='Points for victory'
+                                      name='points_victory'
+                                      errors={errors}
+                                      defaultValue={1}
+                                      register={register}
+                                      validationSchema={{ 
+                                          required: "⚠ This input is required." 
+                                        }}
+                                      onChange={inputChangeHandler}>
+                                  </MyFormGroupInput>
+                              </div>
+                              <div className='col'>
+                                  <MyFormGroupInput
+                                      label='Points for draw'
+                                      name='points_draw'
+                                      errors={errors}
+                                      defaultValue={0}
+                                      register={register}
+                                      validationSchema={{ 
+                                          required: "⚠ This input is required." 
+                                        }}
+                                      onChange={inputChangeHandler}>
+                                  </MyFormGroupInput>
+                              </div>
+                              <div className='col'>
+                                  <MyFormGroupInput
+                                      label='Points per loss'
+                                      name='points_loss'
+                                      defaultValue={0}
+                                      errors={errors}
+                                      register={register}
+                                      validationSchema={{ 
+                                          required: "⚠ This input is required." 
+                                        }}
+                                      onChange={inputChangeHandler}>
+                                  </MyFormGroupInput>
+                              </div>
+                          </div>
+                      </>
+                      : <></>
+                }
+                                           
                 <MyFormGroupInput
                     label='Participants'
                     name='participants'
@@ -178,72 +298,6 @@ const CreateTournament = () => {
                     }}
                     onChange={inputChangeHandler}>
                 </MyFormGroupInput>
-                  <Form.Group className="mb-3">
-                  <Form.Label>Bracket type</Form.Label>
-                  <Form.Select 
-                      className='shadow-none select-input' 
-                      name='type' 
-                      onChange={(e)=>inputSelectChangeHandler(e)}>
-                      <option value="SE">Single Elimination</option>
-                      <option value="DE">Double Elimination</option>
-                      <option value="RR">Round Robin</option>
-                  </Form.Select>
-                  </Form.Group>
-                  {responseBody.type === "SE"
-                      ? 
-                        <Form.Check type='checkbox'>
-                          <Form.Check.Input name='secod_final'
-                          onChange={(e)=>inputCheckBoxChangeHandler(e)} className='my_ckeckbox' type='checkbox'/>
-                          <Form.Check.Label style={{color: 'inherit'}}>{`Include a match for 3rd place between semifinal losers`}</Form.Check.Label>
-                        </Form.Check>
-                      : <></>
-                  }
-                  {responseBody.type === "RR"
-                                ? <>
-                                    <div className='row'>
-                                        <div className='col'>
-                                            <MyFormGroupInput
-                                                label='Points for victory'
-                                                name='points_victory'
-                                                errors={errors}
-                                                defaultValue={1}
-                                                register={register}
-                                                validationSchema={{ 
-                                                    required: "⚠ This input is required." 
-                                                  }}
-                                                onChange={inputChangeHandler}>
-                                            </MyFormGroupInput>
-                                        </div>
-                                        <div className='col'>
-                                            <MyFormGroupInput
-                                                label='Points for draw'
-                                                name='points_draw'
-                                                errors={errors}
-                                                defaultValue={0}
-                                                register={register}
-                                                validationSchema={{ 
-                                                    required: "⚠ This input is required." 
-                                                  }}
-                                                onChange={inputChangeHandler}>
-                                            </MyFormGroupInput>
-                                        </div>
-                                        <div className='col'>
-                                            <MyFormGroupInput
-                                                label='Points per loss'
-                                                name='points_loss'
-                                                defaultValue={0}
-                                                errors={errors}
-                                                register={register}
-                                                validationSchema={{ 
-                                                    required: "⚠ This input is required." 
-                                                  }}
-                                                onChange={inputChangeHandler}>
-                                            </MyFormGroupInput>
-                                        </div>
-                                    </div>
-                                </>
-                                : <></>
-                            }
             </Card.Body>
         </MyCard>
       </div>
