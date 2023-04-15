@@ -1,7 +1,8 @@
 import re
 import math
 import secrets
-
+import datetime
+from .models import Tournament, Bracket
 
 def clear_participants(participants: list) -> list:
     return [i.strip() for i in re.split(r'[\n\r]+', participants)]
@@ -9,12 +10,149 @@ def clear_participants(participants: list) -> list:
 
 # игру выйграл проиграл, серию выиграл проиграл ничья
     
+
+class MultiStage:
+    def __init__(self, participants: list, stage_info: dict, time_managment: dict={}, points: dict={}, second_final: bool=False) -> None:
+        self.participants = participants
+        self.stage_info = stage_info
+        self.time_managment = time_managment
+        self.points = points
+        self.second_final = second_final
+
+    def append_participant(self, name: str) -> dict:
+        return  {
+                    'id': secrets.token_hex(16),
+                    'score': 0,
+                    'participant': f"{name}",
+                    'isWinner': False
+                }
+
+    def create_multi_stage_brackets(self) -> dict:  
+        brackets = []
+        start = 0
+        end = self.stage_info.get('compete_in_group')
+        if self.stage_info.get('group_type') == 'SE':
+            for i in range(len(self.participants) // self.stage_info.get('compete_in_group')):
+                group_stage = SingleEl(self.participants[start:end], self.time_managment)
+                brackets.append(group_stage.create_se_bracket())
+                start += self.stage_info.get('compete_in_group')
+                end += self.stage_info.get('compete_in_group')
+        elif self.stage_info.get('group_type') == 'DE':
+            for i in range(len(self.participants) // self.stage_info.get('compete_in_group')):
+                group_stage = DoubleEl(self.participants[start:end], self.time_managment)
+                brackets.append(group_stage.create_de_bracket())
+                start += self.stage_info.get('compete_in_group')
+                end += self.stage_info.get('compete_in_group')
+        elif self.stage_info.get('group_type') == 'RR':
+            for i in range(len(self.participants) // self.stage_info.get('compete_in_group')):
+                group_stage = RoundRobin(self.participants[start:end], {'win': 1, 'loss': 0, 'draw': 0}, self.time_managment)
+                brackets.append(group_stage.create_round_robin_bracket())
+                start += self.stage_info.get('compete_in_group')
+                end += self.stage_info.get('compete_in_group')
+        elif self.stage_info.get('group_type') == 'SW':
+            for i in range(len(self.participants) // self.stage_info.get('compete_in_group')):
+                group_stage = Swiss(self.participants[start:end], {'win': 1, 'loss': 0, 'draw': 0}, self.time_managment)
+                brackets.append(group_stage.create_swiss_bracket())
+                start += self.stage_info.get('compete_in_group')
+                end += self.stage_info.get('compete_in_group')
+       
+        TBO_participants = ['TBO' for i in range(len(self.participants) // self.stage_info.get('compete_in_group') * self.stage_info.get('advance_from_group'))] 
+        
+        if self.stage_info.get('type') == 'SE':
+            final_stage = SingleEl(TBO_participants, self.time_managment, self.second_final)
+            brackets.append(final_stage.create_se_bracket())
+        elif self.stage_info.get('type') == 'DE':
+            final_stage = DoubleEl(TBO_participants, self.time_managment)
+            brackets.append(final_stage.create_de_bracket())
+        elif self.stage_info.get('type') == 'RR':
+            final_stage = RoundRobin(TBO_participants, self.points, self.time_managment)
+            brackets.append(final_stage.create_round_robin_bracket())
+        elif self.stage_info.get('type') == 'SW':
+            final_stage = Swiss(TBO_participants, self.points, self.time_managment)
+            brackets.append(final_stage.create_swiss_bracket())
+
+        return brackets
+
+    def set_match_score(match: dict, instance) -> None:
+        final_stage = Bracket.objects.get(tournament = instance.tournament, final=True)
+        stage_played = True
+        if instance.type == 'SE':
+            SingleEl.set_match_score(match, instance.bracket)
+        elif instance.type == 'RR':
+            RoundRobin.set_match_score(match, instance.bracket)
+        elif instance.type == 'DE':
+            DoubleEl.set_match_score(match, instance.bracket)
+        elif instance.type == 'SW':
+            Swiss.set_match_score(match, instance.bracket)
+
+        if instance.type == 'RR' or instance.type == 'SW':
+            for round in instance.bracket.get('rounds'):
+                if stage_played == True:
+                    for match in round:
+                        # not all match played
+                        if match.get("state") == "SCHEDULED":
+                            stage_played = False
+                            break
+
+            if stage_played == True:
+                table = sorted(instance.bracket.get('table'), reverse=True, key=lambda partic: (partic.get('berger'), partic.get('score')))
+                
+
+        elif instance.type == 'SE':
+            stage_played = True
+            if instance.bracket[-1].get("seeds")[-1].get("state") == "SCHEDULED" and instance.bracket[-2].get("seeds")[-1].get("state") == "SCHEDULED":
+                stage_played = False
+            if stage_played == True:
+                table = []
+                for round in instance.bracket[::-1]:
+                    for match in round.get('seeds'):
+                        if int(match.get('teams')[0].get('score')) > int(match.get('teams')[1].get('score')):
+                            if match.get('teams')[0].get('participant') not in table:
+                                table.append({'participant': match.get('teams')[0].get('participant')})
+                            if match.get('teams')[1].get('participant') not in table:
+                                table.append({'participant': match.get('teams')[1].get('participant')})
+                        else:
+                            if match.get('teams')[1].get('participant') not in table:
+                                table.append({'participant': match.get('teams')[1].get('participant')})
+                            if match.get('teams')[0].get('participant') not in table:
+                                table.append({'participant': match.get('teams')[0].get('participant')})
+
+        elif instance.type == 'DE':
+            stage_played = True
+            if instance.bracket['upper_rounds'][-1].get("seeds")[-1].get("state") == "SCHEDULED":
+                stage_played = False
+            if stage_played == True:
+                table = []
+                for round in instance.bracket['upper_rounds'][::-1]:
+                    for match in round.get('seeds'):
+                        if int(match.get('teams')[0].get('score')) > int(match.get('teams')[1].get('score')):
+                            if {'participant': match.get('teams')[0].get('participant')} not in table:
+                                table.append({'participant': match.get('teams')[0].get('participant')})
+                            if {'participant': match.get('teams')[1].get('participant')} not in table:
+                                table.append({'participant': match.get('teams')[1].get('participant')})
+                        else:
+                            if {'participant': match.get('teams')[1].get('participant')} not in table:
+                                table.append({'participant': match.get('teams')[1].get('participant')})
+                            if {'participant': match.get('teams')[0].get('participant')} not in table:
+                                table.append({'participant': match.get('teams')[0].get('participant')})
+                print(table)
+
+        if stage_played == True:
+            if final_stage.type == 'SE':
+                SingleEl.fill_participants(instance, table[:1])
+            elif final_stage.type == 'DE':
+                DoubleEl.fill_participants(instance, table[:1])
+
+        
+
+
 class RoundRobin:
 
-    def __init__(self, participants: list, points: dict) -> None:
+    def __init__(self, participants: list, points: dict, time_managment: dict={}) -> None:
         self.participants = [self.append_participant(name) for name in participants]
         self.match_table = [self.append_participant_to_table(name) for name in participants]
         self.points = points
+        self.time_managment = time_managment
 
     @staticmethod
     def set_match_score(match: dict, bracket) -> None:
@@ -22,11 +160,11 @@ class RoundRobin:
         match_id = match.get('match_id')
         prev_match_state = bracket.get('rounds')[round_id][match_id]
 
-        current_first_res = int(match.get('participants')[0].get('resultText'))
-        current_second_res = int(match.get('participants')[1].get('resultText'))
+        current_first_res = int(match.get('participants')[0].get('score'))
+        current_second_res = int(match.get('participants')[1].get('score'))
         
-        first_partic_res = current_first_res - int(prev_match_state.get('participants')[0].get('resultText'))
-        second_partic_res = current_second_res - int(prev_match_state.get('participants')[1].get('resultText'))
+        first_partic_res = current_first_res - int(prev_match_state.get('participants')[0].get('score'))
+        second_partic_res = current_second_res - int(prev_match_state.get('participants')[1].get('score'))
         
         # generators search participant in table O(n)
         first_partic = next(partic for partic in bracket.get('table') if partic['participant'] == match.get('participants')[0].get('participant'))
@@ -48,7 +186,7 @@ class RoundRobin:
                 # add res in table
                 second_partic['win'] += 1
                 first_partic['loose'] += 1
-            elif current_second_res == 0 and match.get('participants')[0].get('resultText') == 0:
+            elif current_second_res == 0 and match.get('participants')[0].get('score') == 0:
                 if current_first_res - current_second_res < 0:
                     second_partic['win'] += 1
                     first_partic['loose'] += 1
@@ -151,7 +289,7 @@ class RoundRobin:
     def append_participant(self, name: str) -> dict:
         return  {
                     'id': secrets.token_hex(16),
-                    'resultText': 0,
+                    'score': 0,
                     'participant': f"{name}",
                     'isWinner': False
                 }
@@ -212,15 +350,36 @@ class RoundRobin:
             round_robin_bracket.append(round)
             map = map[mid:-1] + map[:mid] + map[-1:]
 
+        # Time managment
+        if self.time_managment.get('time_managment'):
+            last_time = self.time_managment.get('start_time')
+            for counter, round in enumerate(round_robin_bracket):
+                if counter == 0:
+                    for game in round[:self.time_managment.get('mathes_same_time')]:
+                        game['startTime'] = f"{last_time}"
+                    for game in round[self.time_managment.get('mathes_same_time'):]: 
+                        game['startTime'] = f"{last_time + datetime.timedelta(minutes=self.time_managment.get('avg_game_time')*self.time_managment.get('max_games_number'))}"
+                else:
+                    for game in round[:self.time_managment.get('mathes_same_time')]:
+                        game['startTime'] = f"{last_time + datetime.timedelta(minutes=self.time_managment.get('break_between'))}"
+                    for game in round[self.time_managment.get('mathes_same_time'):]: 
+                        game['startTime'] = f"{last_time + datetime.timedelta(minutes=self.time_managment.get('break_between')) + datetime.timedelta(minutes=self.time_managment.get('avg_game_time')*self.time_managment.get('max_games_number'))}"
+                last_time = last_time + datetime.timedelta(minutes=self.time_managment.get('avg_game_time')*self.time_managment.get('max_games_number'))
+        else:
+             for counter, round in enumerate(round_robin_bracket):
+                for game in round:
+                    game['startTime'] = f"{self.time_managment.get('start_time')}"
+
         return {'rounds': round_robin_bracket, 'table': self.match_table, 'points': self.points}
     
 
 class SingleEl:
 
-    def __init__(self, participants, second_final=False) -> None:
+    def __init__(self, participants: dict, time_managment: dict={}, second_final: bool=False) -> None:
         self.participants = [self.append_participant(name) for name in participants]
         self.second_final = second_final
         self.length = len(participants)
+        self.time_managment = time_managment
 
     def single_el_number_of_rounds(self) -> int:
         return math.ceil(math.log2(len(self.participants)))
@@ -251,7 +410,42 @@ class SingleEl:
                     second_participant
                 ]
             }
-        
+    @staticmethod
+    def fill_participants(instance: Bracket, participants: dict):
+        final = Bracket.objects.get(tournament = instance.tournament, final=True)
+        # print(instance.bracket[0]['seeds'][0]['teams'][0]['participant'])
+        print(len(final.bracket[0]['seeds']) // 2)
+        for j in participants:
+            for i in range(len(final.bracket[0]['seeds']) // 2):
+                
+                if final.bracket[0]['seeds'][i].get('teams')[0].get('participant') == 'TBO':
+                    final.bracket[0]['seeds'][i]['teams'][0]['participant'] = j.get('participant')
+                    break
+
+                elif final.bracket[0]['seeds'][len(final.bracket[0]['seeds']) // 2 + i].get('teams')[0].get('participant') == 'TBO':
+                    final.bracket[0]['seeds'][len(final.bracket[0]['seeds']) // 2 + i]['teams'][0]['participant'] = j.get('participant')
+                    break
+
+                elif final.bracket[0]['seeds'][i].get('teams')[1].get('participant') == 'TBO':
+                    final.bracket[0]['seeds'][i]['teams'][1]['participant'] = j.get('participant')
+                    break
+
+                elif final.bracket[0]['seeds'][len(final.bracket[0]['seeds']) // 2 + i].get('teams')[1].get('participant') == 'TBO':
+                    final.bracket[0]['seeds'][len(final.bracket[0]['seeds']) // 2 + i]['teams'][1]['participant'] = j.get('participant')
+                    break
+            if (len(final.bracket[0]['seeds']) // 2 == 0):
+                if final.bracket[0]['seeds'][0].get('teams')[0].get('participant') == 'TBO':
+                    final.bracket[0]['seeds'][0]['teams'][0]['participant'] = j.get('participant')
+                    break
+
+                elif final.bracket[0]['seeds'][0].get('teams')[1].get('participant') == 'TBO':
+                    final.bracket[0]['seeds'][0]['teams'][1]['participant'] = j.get('participant')
+                    break
+
+   
+        final.save()
+                
+
     @staticmethod
     def set_match_score(current_match, bracket) -> None:
         round_id = current_match.get('round_id')
@@ -327,7 +521,7 @@ class SingleEl:
         elif prev_match.get('state')  == "SCHEDULED" and current_match.get('state')  == "PLAYED": 
             winner =  1 if int(current_match['teams'][0]['score']) < int(current_match['teams'][1]['score'])  else 0
             if bracket[round_id] != bracket[-1] and len(bracket[round_id]['seeds']) != len(bracket[-1]['seeds']):
-                print('S -> P')
+
                 if match_id % 2 == 0:
                     match_index =  match_id - (match_id // 2)
                     team_index = 0
@@ -347,17 +541,16 @@ class SingleEl:
         rounds = []
         nummber_of_rounds = self.single_el_number_of_rounds()
         number_of_match = 2**nummber_of_rounds
-        print(f'nummber_of_rounds {nummber_of_rounds}')
-        print(f'number_of_match {number_of_match}')
+
         # if not power of two
         if 2**nummber_of_rounds != self.length:
             number_of_match = 2**(nummber_of_rounds-1)
-            print(f'additional rounds {self.length - 2**(nummber_of_rounds - 1)}')
+            
            
             full_first = self.length - 2**(nummber_of_rounds - 1)
             
             with_one_first = self.length - 2**(nummber_of_rounds - 1)
-            print(f'full rounds {full_first}')
+           
 
             # create firs round
             first_round = {'title': 0, 'seeds': []}
@@ -399,14 +592,36 @@ class SingleEl:
         # add second final
         if self.second_final:
             rounds.append({'title': 'Final for 3 place', 'seeds': [self.get_match()]})
+
+        # Time managment
+        if self.time_managment.get('time_managment'):
+            last_time = self.time_managment.get('start_time')
+            for counter, round in enumerate(rounds):
+                if counter == 0:
+                    for game in round["seeds"][:self.time_managment.get('mathes_same_time')]:
+                        game['startTime'] = f"{last_time}"
+                    for game in round["seeds"][self.time_managment.get('mathes_same_time'):]: 
+                        game['startTime'] = f"{last_time + datetime.timedelta(minutes=self.time_managment.get('avg_game_time')*self.time_managment.get('max_games_number'))}"
+                else:
+                    for game in round["seeds"][:self.time_managment.get('mathes_same_time')]:
+                        game['startTime'] = f"{last_time + datetime.timedelta(minutes=self.time_managment.get('break_between'))}"
+                    for game in round["seeds"][self.time_managment.get('mathes_same_time'):]: 
+                        game['startTime'] = f"{last_time + datetime.timedelta(minutes=self.time_managment.get('break_between')) + datetime.timedelta(minutes=self.time_managment.get('avg_game_time')*self.time_managment.get('max_games_number'))}"
+                last_time = last_time + datetime.timedelta(minutes=self.time_managment.get('avg_game_time')*self.time_managment.get('max_games_number'))
+        else:
+             for counter, round in enumerate(rounds):
+                for game in round["seeds"]:
+                    game['startTime'] = f"{self.time_managment.get('start_time')}"
+        
         return rounds
 
 
 class DoubleEl:
 
-    def __init__(self, participants: list) -> None:
+    def __init__(self, participants: list, time_managment: dict={}) -> None:
         self.participants = [self.append_participant(name) for name in participants]
         self.length = len(participants)
+        self.time_managment = time_managment
 
     def single_el_number_of_rounds(self) -> int:
         return math.ceil(math.log2(len(self.participants)))
@@ -437,6 +652,39 @@ class DoubleEl:
                     second_participant
                 ]
             }
+    
+    @staticmethod
+    def fill_participants(instance: Bracket, participants: dict):
+        final = Bracket.objects.get(tournament = instance.tournament, final=True)
+        # print(instance.bracket[0]['seeds'][0]['teams'][0]['participant'])
+        for j in participants:
+            for i in range(len(final.bracket['upper_rounds'][0]['seeds']) // 2):
+                if final.bracket['upper_rounds'][0]['seeds'][i].get('teams')[0].get('participant') == 'TBO':
+                    final.bracket['upper_rounds'][0]['seeds'][i]['teams'][0]['participant'] = j.get('participant')
+                    break
+
+                elif final.bracket['upper_rounds'][0]['seeds'][len(final.bracket['upper_rounds'][0]['seeds']) // 2 + i].get('teams')[0].get('participant') == 'TBO':
+                    final.bracket['upper_rounds'][0]['seeds'][len(final.bracket['upper_rounds'][0]['seeds']) // 2 + i]['teams'][0]['participant'] = j.get('participant')
+                    break
+
+                elif final.bracket['upper_rounds'][0]['seeds'][i].get('teams')[1].get('participant') == 'TBO':
+                    final.bracket['upper_rounds'][0]['seeds'][i]['teams'][1]['participant'] = j.get('participant')
+                    break
+
+                elif final.bracket['upper_rounds'][0]['seeds'][len(final.bracket['upper_rounds'][0]['seeds']) // 2 + i].get('teams')[1].get('participant') == 'TBO':
+                    final.bracket['upper_rounds'][0]['seeds'][len(final.bracket['upper_rounds'][0]['seeds']) // 2 + i]['teams'][1]['participant'] = j.get('participant')
+                    break
+
+            if (len(final.bracket[0]['seeds']) // 2 == 0):
+                if final.bracket[0]['seeds'][0].get('teams')[0].get('participant') == 'TBO':
+                    final.bracket[0]['seeds'][0]['teams'][0]['participant'] = j.get('participant')
+                    break
+
+                elif final.bracket[0]['seeds'][0].get('teams')[1].get('participant') == 'TBO':
+                    final.bracket[0]['seeds'][0]['teams'][1]['participant'] = j.get('participant')
+                    break
+
+        final.save()
 
     @staticmethod
     def set_match_score(current_match, bracket) -> None:
@@ -497,9 +745,8 @@ class DoubleEl:
                         
                         # check last
                         lower_winner = 0 if int(prev_match['teams'][0]['score']) < int(prev_match['teams'][1]['score'])  else 1
-                        print(f'lower_winner {lower_winner}')
+
                         if bracket['upper_rounds'][-1]['seeds'][-1]['teams'][1]['id'] == current_match['teams'][lower_winner]['id']:
-                            print('www')
                             bracket['upper_rounds'][-1]['seeds'][-1]['state'] = "SCHEDULED"
                             bracket['upper_rounds'][-1]['seeds'][-1]['teams'][1]['participant'] = "---"
                             bracket['upper_rounds'][1]['seeds'][-1]['teams'][1]['score']  = 0
@@ -546,9 +793,9 @@ class DoubleEl:
                             bracket['lower_rounds'][round_index_lower]['seeds'][match_index_lower]['teams'][team_index_lower]['id'] = secrets.token_hex(16)
                             # check last
                             lower_winner = 0 if int(prev_match['teams'][0]['score']) < int(prev_match['teams'][1]['score'])  else 1
-                            print(f'lower_winner {lower_winner}')
+
                             if bracket['upper_rounds'][-1]['seeds'][-1]['teams'][1]['id'] == current_match['teams'][lower_winner]['id']:
-                                print('www')
+
                                 bracket['upper_rounds'][-1]['seeds'][-1]['state'] = "SCHEDULED"
                                 bracket['upper_rounds'][-1]['seeds'][-1]['teams'][1]['participant'] = "---"
                                 bracket['upper_rounds'][1]['seeds'][-1]['teams'][1]['score']  = 0
@@ -707,13 +954,12 @@ class DoubleEl:
                     # leave function
                     return
 
-    def create_se_bracket(self) -> list:
+    def create_de_bracket(self) -> list:
         upper_rounds = []
         lower_rounds = []
         nummber_of_rounds = self.single_el_number_of_rounds()
         number_of_match = 2**nummber_of_rounds
-        print(f'nummber_of_rounds {nummber_of_rounds}')
-        print(f'number_of_match {number_of_match}')
+
         # if not power of two
         if 2**nummber_of_rounds != self.length:
             number_of_match = 2**(nummber_of_rounds-1)
@@ -756,20 +1002,59 @@ class DoubleEl:
             round_1 = {'title': i, 'seeds': []}
             round_2 = {'title': i, 'seeds': []}
             for j in range(int(2**nummber_of_rounds / 2**i)):
-                print(f"int(number_of_match / 2**i) {int(number_of_match / 2**i)}")
                 round_1.get('seeds').append(self.get_match())
                 round_2.get('seeds').append(self.get_match())
             lower_rounds.append(round_1)
             lower_rounds.append(round_2)
+
+        # Time managment
+        if self.time_managment.get('time_managment'):
+            last_time = self.time_managment.get('start_time')
+            # upper bracket
+            for counter, round in enumerate(upper_rounds[0:-1]):
+                if counter == 0:
+                    for game in round["seeds"][:self.time_managment.get('mathes_same_time')]:
+                        game['startTime'] = f"{last_time}"
+                    for game in round["seeds"][self.time_managment.get('mathes_same_time'):]: 
+                        game['startTime'] = f"{last_time + datetime.timedelta(minutes=self.time_managment.get('avg_game_time')*self.time_managment.get('max_games_number'))}"
+                else:
+                    for game in round["seeds"][:self.time_managment.get('mathes_same_time')]:
+                        game['startTime'] = f"{last_time + datetime.timedelta(minutes=self.time_managment.get('break_between'))}"
+                    for game in round["seeds"][self.time_managment.get('mathes_same_time'):]: 
+                        game['startTime'] = f"{last_time + datetime.timedelta(minutes=self.time_managment.get('break_between')) + datetime.timedelta(minutes=self.time_managment.get('avg_game_time')*self.time_managment.get('max_games_number'))}"
+                last_time = last_time + datetime.timedelta(minutes=self.time_managment.get('avg_game_time')*self.time_managment.get('max_games_number'))
+            # lower bracket
+            for counter, round in enumerate(lower_rounds):
+                if counter == 0:
+                    for game in round["seeds"][:self.time_managment.get('mathes_same_time')]:
+                        game['startTime'] = f"{last_time}"
+                    for game in round["seeds"][self.time_managment.get('mathes_same_time'):]: 
+                        game['startTime'] = f"{last_time + datetime.timedelta(minutes=self.time_managment.get('avg_game_time')*self.time_managment.get('max_games_number'))}"
+                else:
+                    for game in round["seeds"][:self.time_managment.get('mathes_same_time')]:
+                        game['startTime'] = f"{last_time + datetime.timedelta(minutes=self.time_managment.get('break_between'))}"
+                    for game in round["seeds"][self.time_managment.get('mathes_same_time'):]: 
+                        game['startTime'] = f"{last_time + datetime.timedelta(minutes=self.time_managment.get('break_between')) + datetime.timedelta(minutes=self.time_managment.get('avg_game_time')*self.time_managment.get('max_games_number'))}"
+                last_time = last_time + datetime.timedelta(minutes=self.time_managment.get('avg_game_time')*self.time_managment.get('max_games_number'))
+            upper_rounds[-1]["seeds"][0]['startTime'] = f"{last_time + datetime.timedelta(minutes=self.time_managment.get('break_between'))}"
+        else:
+            for counter, round in enumerate(upper_rounds):
+                for game in round["seeds"]:
+                    game['startTime'] = f"{self.time_managment.get('start_time')}"
+            for counter, round in enumerate(lower_rounds):
+                for game in round["seeds"]:
+                    game['startTime'] = f"{self.time_managment.get('start_time')}"
         
         return {'upper_rounds': upper_rounds, 'lower_rounds': lower_rounds}
 
 
 class Swiss:
-    def __init__(self, participants: list, points: dict) -> None:
+    def __init__(self, participants: list, points: dict, time_managment: dict={}) -> None:
+        print(participants)
         self.participants = [self.append_participant(name) for name in participants]
         self.match_table = [self.append_participant_to_table(name) for name in participants]
         self.points = points
+        self.time_managment = time_managment
 
     @staticmethod
     def set_match_score(match: dict, bracket: list) -> None:
@@ -778,11 +1063,11 @@ class Swiss:
         match_id = match.get('match_id')
         prev_match_state = bracket.get('rounds')[round_id][match_id]
 
-        current_first_res = int(match.get('participants')[0].get('resultText'))
-        current_second_res = int(match.get('participants')[1].get('resultText'))
+        current_first_res = int(match.get('participants')[0].get('score'))
+        current_second_res = int(match.get('participants')[1].get('score'))
         
-        first_partic_res = current_first_res - int(prev_match_state.get('participants')[0].get('resultText'))
-        second_partic_res = current_second_res - int(prev_match_state.get('participants')[1].get('resultText'))
+        first_partic_res = current_first_res - int(prev_match_state.get('participants')[0].get('score'))
+        second_partic_res = current_second_res - int(prev_match_state.get('participants')[1].get('score'))
         
        
         # generators search participant in table O(n)
@@ -808,7 +1093,7 @@ class Swiss:
                 # add res in table
                 second_partic['win'] += 1
                 first_partic['loose'] += 1
-            elif current_second_res == 0 and match.get('participants')[0].get('resultText') == 0:
+            elif current_second_res == 0 and match.get('participants')[0].get('score') == 0:
                 if current_first_res - current_second_res < 0:
                     second_partic['win'] += 1
                     first_partic['loose'] += 1
@@ -920,10 +1205,6 @@ class Swiss:
                 elif count == 0:
                     first['buchholz'] = 0
 
-                
-                
-                print(f'{j.get("participants")[0].get("participant")} {first["scores"]}')
-                print(f'{j.get("participants")[1].get("participant")} {second["scores"]}')
 
         # new round
         if round_end and round_id!= len(bracket.get('rounds')) - 1 and bracket.get('rounds')[round_id+1][0].get('participants')[0].get('participant') == 'TBO':
@@ -945,9 +1226,9 @@ class Swiss:
                 for index in range(1, len(parts)):
                     if parts[index].get('participant') not in previously_played:
 
-                        t1 = {'id': parts[0].get('id'), 'resultText': 0, 'participant': parts[0].get('participant'), 'isWinner': False}
+                        t1 = {'id': parts[0].get('id'), 'score': 0, 'participant': parts[0].get('participant'), 'isWinner': False}
                         parts.pop(0)
-                        t2 = {'id': parts[index-1].get('id'), 'resultText': 0, 'participant': parts[index-1].get('participant'), 'isWinner': False}
+                        t2 = {'id': parts[index-1].get('id'), 'score': 0, 'participant': parts[index-1].get('participant'), 'isWinner': False}
                         parts.pop(index-1)
                         round.append({
                             "id": bracket.get('rounds')[round_id+1][0].get('id'),
@@ -960,7 +1241,7 @@ class Swiss:
                             })
                         break
             bracket.get('rounds')[round_id+1] = round
-        return 
+        
     
     def swiss_number_of_rounds(self) -> int:
         return math.ceil(math.log2(len(self.participants)))
@@ -968,7 +1249,7 @@ class Swiss:
     def append_participant(self, name: str) -> dict:
         return  {
                     'id': secrets.token_hex(16),
-                    'resultText': 0,
+                    'score': 0,
                     'participant': f"{name}",
                     'isWinner': False
                 }
@@ -1018,5 +1299,25 @@ class Swiss:
                         ]
                         })
             swiss_bracket.append(round)
+
+        # Time managment
+        if self.time_managment.get('time_managment'):
+            last_time = self.time_managment.get('start_time')
+            for counter, round in enumerate(swiss_bracket):
+                if counter == 0:
+                    for game in round[:self.time_managment.get('mathes_same_time')]:
+                        game['startTime'] = f"{last_time}"
+                    for game in round[self.time_managment.get('mathes_same_time'):]: 
+                        game['startTime'] = f"{last_time + datetime.timedelta(minutes=self.time_managment.get('avg_game_time')*self.time_managment.get('max_games_number'))}"
+                else:
+                    for game in round[:self.time_managment.get('mathes_same_time')]:
+                        game['startTime'] = f"{last_time + datetime.timedelta(minutes=self.time_managment.get('break_between'))}"
+                    for game in round[self.time_managment.get('mathes_same_time'):]: 
+                        game['startTime'] = f"{last_time + datetime.timedelta(minutes=self.time_managment.get('break_between')) + datetime.timedelta(minutes=self.time_managment.get('avg_game_time')*self.time_managment.get('max_games_number'))}"
+                last_time = last_time + datetime.timedelta(minutes=self.time_managment.get('avg_game_time')*self.time_managment.get('max_games_number'))
+        else:
+             for counter, round in enumerate(swiss_bracket):
+                for game in round:
+                    game['startTime'] = f"{self.time_managment.get('start_time')}"
 
         return {'rounds': swiss_bracket, 'table': self.match_table, 'points': self.points}

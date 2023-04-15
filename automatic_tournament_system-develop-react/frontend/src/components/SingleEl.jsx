@@ -12,6 +12,8 @@ const SingleEl = ({bracket, id, owner}) => {
         setBracket(data)
     }
 
+    console.log(bracket)
+
       
     return (
         // <BracketWrapper>

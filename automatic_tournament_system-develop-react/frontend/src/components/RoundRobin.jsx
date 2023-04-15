@@ -4,6 +4,7 @@ import React, { useState} from "react";
 import BracketWrapper from "./UI/BracketWrapper/BracketWrapper";
 
 const RoundRobin = ({id, bracket, owner}) => {
+    console.log('work i')
     const [bracketAll, setBracketAll] = useState(bracket)
     const [table, setTable] = useState(bracket.table)
     

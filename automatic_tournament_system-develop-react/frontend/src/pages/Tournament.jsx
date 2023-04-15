@@ -20,10 +20,10 @@ const Tournament = () => {
     const params = useParams()
     const [id, setId] = useState(0)
     const [bracket, setBracket] = useState([])
-
-    const [tournament, setTournament] = useState({})
-   
     const [types, setTypes] = useState("")
+    const [groupStage, setGroupStage] = useState([])
+    const [tournament, setTournament] = useState({})
+    
     const { user } = useContext(AuthContext);
     const [fetchTournament, isLoading, error] = useFetching(async (slug) => {
         const response = await PostService.getTournamentBySlug(slug)
@@ -42,9 +42,18 @@ const Tournament = () => {
 
     const [fetchBrackets, isBraLoadind, braError] = useFetching(async (slug) => {
         const response = await PostService.allTournamentBrackets(slug)
-        setBracket(response.data.brackets[0].bracket)
-        setTypes(response.data.brackets[0].type)
-        setId(response.data.brackets[0].id)
+        
+        if (response.data.brackets.length > 1) {
+            for (let i = 0; i < response.data.brackets.length - 1; i++) { 
+                setGroupStage(groupStage => [...groupStage, [response.data.brackets[i].id,
+                                                response.data.brackets[i].type,
+                                                response.data.brackets[i].bracket]])
+            }   
+        }
+        setBracket(response.data.brackets[response.data.brackets.length-1].bracket)
+        setTypes(response.data.brackets[response.data.brackets.length-1].type)
+        setId(response.data.brackets[response.data.brackets.length-1].id)
+        
     })
 
     useEffect(() => {
@@ -101,40 +110,115 @@ const Tournament = () => {
                                     </div>
                                     <div className="row my-3">
                                         <div className="col">
-                                            <Accordion flush defaultActiveKey={['1']} alwaysOpen>
+                                            <Accordion flush defaultActiveKey={['1', '2']} alwaysOpen>
                                                 <Accordion.Item eventKey="0">
                                                     <Accordion.Header className="my_accordion_body"><h4 >Description</h4></Accordion.Header>
                                                     <Accordion.Body className="my_accordion_body">
                                                         <p>{tournament.content}</p>
                                                     </Accordion.Body>
                                                 </Accordion.Item>
-                                                <Accordion.Item eventKey="1">
+                                                {groupStage.length > 0
+                                                ? <>
+                                                    <Accordion.Item eventKey="1">
+                                                        <Accordion.Header className="my_accordion_body"><h4>Group stage</h4></Accordion.Header>
+                                                        <Accordion.Body className="my_accordion_body">
+                                                        { isBraLoadind 
+                                                            ? <div className='loader'><Loader/></div>
+                                                            : <> 
+                                                                {groupStage.map((bracket, idx) => {
+                                                                    
+                                                                    if (bracket[1] === "RR") {
+                                                                        return <div className='mb-5'>   
+                                                                            <h5>Group {idx}</h5>
+                                                                            <RoundRobin id={bracket[0]} bracket={bracket[2]} owner={tournament.owner}/>
+                                                                        </div> 
+                                                                    }
+                                                                    else if (bracket[1] === "SE") {
+                                                                        return <div className='mb-5'>
+                                                                            <h5>Group {idx}</h5>
+                                                                            <SingleEl id={bracket[0]} bracket={bracket[2]} owner={tournament.owner}/>
+                                                                        </div> 
+                                                                    }
+                                                                    else if (bracket[1] === "DE") {
+                                                                        return <div className='mb-5'>
+                                                                            <h5>Group {idx}</h5>
+                                                                            <DoubleEl id={bracket[0]} bracket={bracket[2]} owner={tournament.owner}/>
+                                                                        </div> 
+                                                                    }
+                                                                    else if (bracket[1] === "SW") {
+                                                                        return <div className='mb-5'>
+                                                                            <h5>Group {idx}</h5>
+                                                                            <Swiss id={bracket[0]} bracket={bracket[2]} owner={tournament.owner}/>
+                                                                        </div> 
+                                                                    }
+                                                                    
+                                                                    
+                                                                }
+                                                                )}
+                                                            </>
+                                                        }
+                                                        </Accordion.Body>  
+                                                    </Accordion.Item>
+                                                    <Accordion.Item eventKey="2">
+                                                        <Accordion.Header className="my_accordion_body"><h4>Final stage</h4></Accordion.Header>
+                                                        <Accordion.Body className="my_accordion_body">
+                                                            {isBraLoadind 
+                                                                ? <div className='loader'><Loader/></div>
+                                                                : <> 
+                                                                    {(() => {
+                                                                        if (types == "SE") {
+                                                                            return (
+                                                                                <SingleEl id={id} bracket={bracket} owner={tournament.owner}/>    
+                                                                            )
+                                                                        } else if (types == "RR") {
+                                                                            return (
+                                                                                <RoundRobin id={id} bracket={bracket} owner={tournament.owner}/>
+                                                                            )
+                                                                        } else if (types == "DE") {
+                                                                            return (
+                                                                                <DoubleEl id={id} bracket={bracket} owner={tournament.owner}/>
+                                                                            )
+                                                                        } else if (types == "SW") {
+                                                                            return (
+                                                                                <Swiss id={id} bracket={bracket} owner={tournament.owner}/>
+                                                                            )
+                                                                        }
+                                                                    })()} 
+                                                                </>
+                                                            }
+                                                        </Accordion.Body>
+                                                    </Accordion.Item>
+                                                </>
+                                                : <Accordion.Item eventKey="1">
                                                     <Accordion.Header className="my_accordion_body"><h4>Bracket</h4></Accordion.Header>
                                                     <Accordion.Body className="my_accordion_body">
                                                     {isBraLoadind 
                                                         ? <div className='loader'><Loader/></div>
                                                         : <> {(() => {
-                                                            if (types == "SE") {
-                                                                return (
-                                                                    <SingleEl id={id} bracket={bracket} owner={tournament.owner}/>    
-                                                                )
-                                                            } else if (types == "RR") {
-                                                                return (
-                                                                    <RoundRobin id={id} bracket={bracket} owner={tournament.owner}/>
-                                                                )
-                                                            } else if (types == "DE") {
-                                                                return (
-                                                                    <DoubleEl id={id} bracket={bracket} owner={tournament.owner}/>
-                                                                )
-                                                            } else if (types == "SW") {
-                                                                return (
-                                                                    <Swiss id={id} bracket={bracket} owner={tournament.owner}/>
-                                                                )
-                                                            }
-                                                        })()} </>
+                                                                if (types == "SE") {
+                                                                    return (
+                                                                        <SingleEl id={id} bracket={bracket} owner={tournament.owner}/>    
+                                                                    )
+                                                                } else if (types == "RR") {
+                                                                    return (
+                                                                        <RoundRobin id={id} bracket={bracket} owner={tournament.owner}/>
+                                                                    )
+                                                                } else if (types == "DE") {
+                                                                    return (
+                                                                        <DoubleEl id={id} bracket={bracket} owner={tournament.owner}/>
+                                                                    )
+                                                                } else if (types == "SW") {
+                                                                    return (
+                                                                        <Swiss id={id} bracket={bracket} owner={tournament.owner}/>
+                                                                    )
+                                                                }
+                                                            })()} 
+                                                        </>
                                                     }
                                                     </Accordion.Body>
                                                 </Accordion.Item>
+                                                }
+                                                
                                             </Accordion>         
                                         </div>
                                     </div>

@@ -18,8 +18,8 @@ const MyRoundRobinMatch = ({id, match, match_id, round_id, onPatch, owner}) => {
     const [matchTime, setMatchTime] = useState(match.startTime)
     const [userOne, setUserOne] = useState(match.participants[0].participant)
     const [userTwo, setuserTwo] = useState(match.participants[1].participant)
-    const [userOneResult, setUserOneResult] = useState(match.participants[0].resultText)
-    const [userTwoResult, setUserTwoResult] = useState(match.participants[1].resultText)
+    const [userOneResult, setUserOneResult] = useState(match.participants[0].score)
+    const [userTwoResult, setUserTwoResult] = useState(match.participants[1].score)
     const { user } = useContext(AuthContext);
     const api = useAxios()
 
@@ -87,9 +87,9 @@ const MyRoundRobinMatch = ({id, match, match_id, round_id, onPatch, owner}) => {
             round_id: round_id,
             participants: [
             {id: match.participants[0].id, isWinner: userOneResult>userTwoResult && matchState=="PLAYED" ? true :false,
-                participant: match.participants[0].participant, picture: null, resultText: userOneResult},
+                participant: match.participants[0].participant, picture: null, score: userOneResult},
             {id: match.participants[1].id, isWinner: userOneResult<userTwoResult && matchState=="PLAYED" ? true :false,
-                participant: match.participants[1].participant, picture: null, resultText: userTwoResult}
+                participant: match.participants[1].participant, picture: null, score: userTwoResult}
         ] }).then(function(res){
             onPatch(res.data.bracket)
       })
@@ -106,11 +106,11 @@ const MyRoundRobinMatch = ({id, match, match_id, round_id, onPatch, owner}) => {
             <div className={classes.myMatch}>
                 <div id={`id${match.participants[0].participant}`} className={classes.side} >
                     <div className={classes.parName} onMouseEnter={(e)=>{hoverOnMatch(`id${match.participants[0].participant}`)}} onMouseLeave={(e)=>{hoverOffMatch(`id${match.participants[0].participant}`)}}>{match.participants[0].participant}</div>
-                    <div onMouseEnter={(e)=>{hoverOnMatch(`id${match.participants[0].participant}`)}} onMouseLeave={(e)=>{hoverOffMatch(`id${match.participants[0].participant}`)}} className={classes.score}>{match.participants[0].resultText}</div>
+                    <div onMouseEnter={(e)=>{hoverOnMatch(`id${match.participants[0].participant}`)}} onMouseLeave={(e)=>{hoverOffMatch(`id${match.participants[0].participant}`)}} className={classes.score}>{match.participants[0].score}</div>
                 </div>
                 <div  id={`id${match.participants[1].participant}`} className={classes.side}>
                     <div className={classes.parName} onMouseEnter={(e)=>{hoverOnMatch(`id${match.participants[1].participant}`)}} onMouseLeave={(e)=>{hoverOffMatch(`id${match.participants[1].participant}`)}}>{match.participants[1].participant}</div>
-                    <div onMouseEnter={(e)=>{hoverOnMatch(`id${match.participants[1].participant}`)}} onMouseLeave={(e)=>{hoverOffMatch(`id${match.participants[1].participant}`)}} className={classes.score}>{match.participants[1].resultText}</div>
+                    <div onMouseEnter={(e)=>{hoverOnMatch(`id${match.participants[1].participant}`)}} onMouseLeave={(e)=>{hoverOffMatch(`id${match.participants[1].participant}`)}} className={classes.score}>{match.participants[1].score}</div>
                 </div>
             </div>
             <div className={`${classes.buttonDiv} p-1`}>
@@ -175,13 +175,13 @@ const MyRoundRobinMatch = ({id, match, match_id, round_id, onPatch, owner}) => {
                             </div>
                             <div className="row align-items-center">
                                 <div className="col">
-                                {match.participants[0].resultText}
+                                {match.participants[0].score}
                                 </div>
                                 <div className="col">
                                 <h4>VS</h4>
                                 </div>
                                 <div className="col">
-                                {match.participants[1].resultText}
+                                {match.participants[1].score}
                                 </div>
                             </div>
                         
@@ -209,13 +209,13 @@ const MyRoundRobinMatch = ({id, match, match_id, round_id, onPatch, owner}) => {
                             </div>
                             <div className="row align-items-center mb-4">
                                 <div className={`col`} >  
-                                <input className={classes.myInput} onChange={e => inputUserOneResultHandler(e)} type="number" defaultValue={match.participants[0].resultText} />
+                                <input className={classes.myInput} onChange={e => inputUserOneResultHandler(e)} type="number" defaultValue={match.participants[0].score} />
                                 </div>
                                 <div className="col">
                                 <h4>VS</h4>
                                 </div>
                                 <div className="col">
-                                <input className={classes.myInput}  onChange={e => inputUserTwoResultHandler(e)} type="number" defaultValue={match.participants[1].resultText} />
+                                <input className={classes.myInput}  onChange={e => inputUserTwoResultHandler(e)} type="number" defaultValue={match.participants[1].score} />
                                 </div>
                             </div>
                             <p>Set State</p>

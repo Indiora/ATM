@@ -40,7 +40,7 @@ class Bracket(models.Model):
 
     tournament = models.ForeignKey('Tournament', related_name='brackets', on_delete=models.CASCADE, null=True)
     bracket = models.JSONField(blank=True)
-
+    final = models.BooleanField(default=True)
     class BracketType(models.TextChoices):
         SINGLEELIMINATION = 'SE', _('Single elimination')
         DOUBLEELIMINATION = 'DE', _('Double elimination')
