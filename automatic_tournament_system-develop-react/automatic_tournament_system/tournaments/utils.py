@@ -37,27 +37,35 @@ class MultiStage:
                 brackets.append(group_stage.create_se_bracket())
                 start += self.stage_info.get('compete_in_group')
                 end += self.stage_info.get('compete_in_group')
+            final_time = brackets[-1][-1].get('seeds')[-1].get("startTime")
         elif self.stage_info.get('group_type') == 'DE':
             for i in range(len(self.participants) // self.stage_info.get('compete_in_group')):
                 group_stage = DoubleEl(self.participants[start:end], self.time_managment)
                 brackets.append(group_stage.create_de_bracket())
                 start += self.stage_info.get('compete_in_group')
-                end += self.stage_info.get('compete_in_group')
+                end += self.stage_info.get('compete_in_group')  
+            final_time = brackets[-1]["upper_rounds"][-1].get('seeds')[-1].get("startTime")
         elif self.stage_info.get('group_type') == 'RR':
             for i in range(len(self.participants) // self.stage_info.get('compete_in_group')):
                 group_stage = RoundRobin(self.participants[start:end], {'win': 1, 'loss': 0, 'draw': 0}, self.time_managment)
                 brackets.append(group_stage.create_round_robin_bracket())
                 start += self.stage_info.get('compete_in_group')
                 end += self.stage_info.get('compete_in_group')
+            final_time = brackets[-1].get('rounds')[-1][-1].get("startTime")
         elif self.stage_info.get('group_type') == 'SW':
             for i in range(len(self.participants) // self.stage_info.get('compete_in_group')):
                 group_stage = Swiss(self.participants[start:end], {'win': 1, 'loss': 0, 'draw': 0}, self.time_managment)
                 brackets.append(group_stage.create_swiss_bracket())
                 start += self.stage_info.get('compete_in_group')
                 end += self.stage_info.get('compete_in_group')
+            
+            final_time = brackets[-1].get('rounds')[-1][-1].get("startTime")
        
         TBO_participants = ['TBO' for i in range(len(self.participants) // self.stage_info.get('compete_in_group') * self.stage_info.get('advance_from_group'))] 
+       
+        final_time = datetime.datetime.strptime(final_time[:16], '%Y-%m-%d %H:%M')
         
+        self.time_managment['start_time'] = self.time_managment['start_time'] - datetime.timedelta(seconds=self.time_managment['start_time'].timestamp()) + datetime.timedelta(seconds=final_time.timestamp()) + datetime.timedelta(minutes=self.time_managment.get('break_between'))
         if self.stage_info.get('type') == 'SE':
             final_stage = SingleEl(TBO_participants, self.time_managment, self.second_final)
             brackets.append(final_stage.create_se_bracket())
@@ -70,6 +78,7 @@ class MultiStage:
         elif self.stage_info.get('type') == 'SW':
             final_stage = Swiss(TBO_participants, self.points, self.time_managment)
             brackets.append(final_stage.create_swiss_bracket())
+            brackets[-1][-1].append({'advance_from_group': self.stage_info.get('advance_from_group')})
 
         return brackets
 
@@ -99,9 +108,14 @@ class MultiStage:
                 
 
         elif instance.type == 'SE':
-            stage_played = True
-            if instance.bracket[-1].get("seeds")[-1].get("state") == "SCHEDULED" and instance.bracket[-2].get("seeds")[-1].get("state") == "SCHEDULED":
-                stage_played = False
+            for round in instance.bracket:
+                if stage_played == True:
+                    for match in round.get('seeds'):
+                        # not all match played
+                        if match.get("state") == "SCHEDULED":
+                            stage_played = False
+                            break
+
             if stage_played == True:
                 table = []
                 for round in instance.bracket[::-1]:
@@ -118,9 +132,14 @@ class MultiStage:
                                 table.append({'participant': match.get('teams')[0].get('participant')})
 
         elif instance.type == 'DE':
-            stage_played = True
-            if instance.bracket['upper_rounds'][-1].get("seeds")[-1].get("state") == "SCHEDULED":
-                stage_played = False
+            for round in instance.bracket["upper_rounds"]:
+                if stage_played == True:
+                    for match in round.get('seeds'):
+                        # not all match played
+                        if match.get("state") == "SCHEDULED":
+                            stage_played = False
+                            break
+
             if stage_played == True:
                 table = []
                 for round in instance.bracket['upper_rounds'][::-1]:
@@ -138,10 +157,14 @@ class MultiStage:
                 print(table)
 
         if stage_played == True:
-            if final_stage.type == 'SE':
-                SingleEl.fill_participants(instance, table[:1])
+            if final_stage.type == 'SE':    
+                SingleEl.fill_participants(instance, table)
             elif final_stage.type == 'DE':
-                DoubleEl.fill_participants(instance, table[:1])
+                DoubleEl.fill_participants(instance, table)
+            elif final_stage.type == 'SW':
+                Swiss.fill_participants(instance, table)
+            elif final_stage.type == 'RR':
+                RoundRobin.fill_participants(instance, table)
 
         
 
@@ -153,6 +176,49 @@ class RoundRobin:
         self.match_table = [self.append_participant_to_table(name) for name in participants]
         self.points = points
         self.time_managment = time_managment
+
+    @staticmethod
+    def fill_participants(instance: Bracket, participants: dict):
+        final = Bracket.objects.get(tournament = instance.tournament, final=True)
+        # print(instance.bracket[0]['seeds'][0]['teams'][0]['participant'])
+        part_for_check = participants[:]
+        for j in participants[:final.participants_from_group]:
+            for round in final.bracket['rounds']:
+                fill_part = False
+                for match in round:
+                    if match.get('participants')[0].get('participant') == 'TBO':
+                        fill_id = match.get('participants')[0].get('id')
+                        fill_part = True
+                        for round in final.bracket['rounds']:
+                            for match in round:
+                                if match.get('participants')[0].get('id') == fill_id:
+                                    match['participants'][0]['participant'] = j.get('participant')
+                                elif match.get('participants')[1].get('id') == fill_id:
+                                    match['participants'][1]['participant'] = j.get('participant')
+                        break
+                    
+                    elif match.get('participants')[1].get('participant') == 'TBO':
+                        fill_id = match.get('participants')[1].get('id')
+                        fill_part = True
+                        for round in final.bracket['rounds']:
+                            for match in round:
+                                if match.get('participants')[0].get('id') == fill_id:
+                                    match['participants'][0]['participant'] = j.get('participant')
+                                elif match.get('participants')[1].get('id') == fill_id:
+                                    match['participants'][1]['participant'] = j.get('participant')
+                        break
+
+                if fill_part == True:
+                    fill_part = False
+                    break
+                
+            for row in final.bracket['table']:
+                if row.get('participant') == "TBO":
+                    row['participant'] = j.get('participant')
+                    break
+                
+
+        final.save()
 
     @staticmethod
     def set_match_score(match: dict, bracket) -> None:
@@ -413,9 +479,8 @@ class SingleEl:
     @staticmethod
     def fill_participants(instance: Bracket, participants: dict):
         final = Bracket.objects.get(tournament = instance.tournament, final=True)
-        # print(instance.bracket[0]['seeds'][0]['teams'][0]['participant'])
-        print(len(final.bracket[0]['seeds']) // 2)
-        for j in participants:
+        print(instance)
+        for j in participants[:final.participants_from_group]:
             for i in range(len(final.bracket[0]['seeds']) // 2):
                 
                 if final.bracket[0]['seeds'][i].get('teams')[0].get('participant') == 'TBO':
@@ -657,7 +722,7 @@ class DoubleEl:
     def fill_participants(instance: Bracket, participants: dict):
         final = Bracket.objects.get(tournament = instance.tournament, final=True)
         # print(instance.bracket[0]['seeds'][0]['teams'][0]['participant'])
-        for j in participants:
+        for j in participants[:final.participants_from_group]:
             for i in range(len(final.bracket['upper_rounds'][0]['seeds']) // 2):
                 if final.bracket['upper_rounds'][0]['seeds'][i].get('teams')[0].get('participant') == 'TBO':
                     final.bracket['upper_rounds'][0]['seeds'][i]['teams'][0]['participant'] = j.get('participant')
@@ -1055,6 +1120,53 @@ class Swiss:
         self.match_table = [self.append_participant_to_table(name) for name in participants]
         self.points = points
         self.time_managment = time_managment
+
+    @staticmethod
+    def fill_participants(instance: Bracket, participants: dict):
+        final = Bracket.objects.get(tournament = instance.tournament, final=True)
+        # print(instance.bracket[0]['seeds'][0]['teams'][0]['participant'])
+        print(len(final.bracket['rounds'][0]) // 2)
+        print(participants)
+  
+        for j in participants[:final.participants_from_group]:
+            for i in range(len(final.bracket['rounds'][0]) // 2):
+                if final.bracket['rounds'][0][i].get('participants')[0].get('participant') == 'TBO':
+                    final.bracket['rounds'][0][i]['participants'][0]['participant'] = j.get('participant')
+                    print(1)
+                    break
+                
+                elif final.bracket['rounds'][0][len(final.bracket['rounds'][0]) // 2 + i].get('participants')[0].get('participant') == 'TBO':
+                    final.bracket['rounds'][0][len(final.bracket['rounds'][0]) // 2 + i]['participants'][0]['participant'] = j.get('participant')
+                    print(3)
+                    break
+
+
+                elif final.bracket['rounds'][0][i].get('participants')[1].get('participant') == 'TBO':
+                    final.bracket['rounds'][0][i]['participants'][1]['participant'] = j.get('participant')
+                    print(2)
+                    break
+                
+               
+                elif final.bracket['rounds'][0][len(final.bracket['rounds'][0]) // 2 + i].get('participants')[1].get('participant') == 'TBO':
+                    final.bracket['rounds'][0][len(final.bracket['rounds'][0]) // 2 + i]['participants'][1]['participant'] = j.get('participant')
+                    print(4)
+                    break
+
+            if len(final.bracket['rounds'][0]) // 2 == 0:
+                if final.bracket['rounds'][0][0].get('participants')[0].get('participant') == 'TBO':
+                    final.bracket['rounds'][0][0]['participants'][0]['participant'] = j.get('participant')
+                    break
+
+                elif final.bracket['rounds'][0][0].get('participants')[1].get('participant') == 'TBO':
+                    final.bracket['rounds'][0][0]['participants'][1]['participant'] = j.get('participant')
+                    break
+                
+            for row in final.bracket['table']:
+                if row.get('participant') == "TBO":
+                    row['participant'] = j.get('participant')
+                    break
+
+        final.save()
 
     @staticmethod
     def set_match_score(match: dict, bracket: list) -> None:

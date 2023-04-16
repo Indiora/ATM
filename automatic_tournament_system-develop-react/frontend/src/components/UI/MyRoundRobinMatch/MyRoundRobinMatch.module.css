@@ -54,7 +54,7 @@
 .matchSvg {
     display: block;
     fill: var(--dark-ligth);
-    background: inherit;
+    background: var(--opposite);
     border: none;
 } 
 

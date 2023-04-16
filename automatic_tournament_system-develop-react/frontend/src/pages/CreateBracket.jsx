@@ -78,6 +78,7 @@ const CreateBracket = () => {
                                     <option value="SE">Single Elimination</option>
                                     <option value="DE">Double Elimination</option>
                                     <option value="RR">Round Robin</option>
+                                    <option value="SW">Swiss</option>
                                 </Form.Select>
                             </Form.Group>
                         {responseBody.type === "SE"
@@ -89,7 +90,7 @@ const CreateBracket = () => {
                                 </Form.Check>
                             : <></>
                         }
-                        {responseBody.type === "RR"
+                        {responseBody.type === "RR" || responseBody.type === "SW"
                             ? <>
                                 <div className='row'>
                                     <div className='col'>

@@ -34,14 +34,14 @@
 }
 
 .iconButton {
-    background: rgb(230, 230, 231); 
+    background: var(--opposite);
     border: none;
 }
 
 .matchSvg {
     display: block;
     fill: var(--dark-ligth);
-    background: inherit;
+    background: var(--opposite);
     border: none;
 } 
 

@@ -5,6 +5,7 @@ import Modal from 'react-bootstrap/Modal';
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch"; 
 import { toPng, toJpeg, toSvg } from 'html-to-image'
 import { FullScreen, useFullScreenHandle } from "react-full-screen";
+import classes from "./BracketWrapper.module.css";
 
 
 const BracketWrapper = ({children}) => {
@@ -93,7 +94,7 @@ const BracketWrapper = ({children}) => {
                     <path d="M24 24H0v-8h2v6h20v-6h2v8zm-12-5.6l-7.7-7.7 1.4-1.4 5.3 5.3V0h2v14.6l5.3-5.3 1.4 1.4-7.7 7.7z"></path>
                 </svg>
               </button>
-              <button onClick={handleFullScreen.enter} style={{border: 'none' }} className="px-2">
+              <button onClick={handleFullScreen.enter} style={{border: 'none', background:'inherit'}} className="px-2">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="16"
@@ -116,13 +117,13 @@ const BracketWrapper = ({children}) => {
         <MyModal 
             show={modalShow}
             onHide={() => setModalShow(false)}>
-            <Modal.Header className="myModalHeader" closeButton >
+            <Modal.Header className={classes.myModalHeader} closeButton >
               Download Bracket
             </Modal.Header>
-            <Modal.Body className="myModalBody">
+            <Modal.Body className={classes.myModalBody}>
               <div className='d-grid'>
-                <MyButton additionalCl={'btn-md'} onClick={onButtonClickPng}>Png</MyButton>
-                <MyButton additionalCl={'btn-md'} onClick={onButtonClickJPEG}>Jpeg</MyButton>
+                <MyButton additionalCl={'btn-md mb-3'} onClick={onButtonClickPng}>Png</MyButton>
+                <MyButton additionalCl={'btn-md mb-3'} onClick={onButtonClickJPEG}>Jpeg</MyButton>
                 <MyButton additionalCl={'btn-md'} onClick={onButtonClickSVG}>SVG</MyButton>
               </div>
             </Modal.Body>

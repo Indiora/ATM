@@ -1,0 +1,10 @@
+.myModalHeader{
+    color: var(--dark-ligth);
+    background: var(--opposite);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.myModalBody{
+    color: var(--dark-ligth);
+    background: var(--opposite);
+}

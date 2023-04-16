@@ -188,9 +188,9 @@ const CreateTournament = () => {
                                 className='shadow-none select-input' 
                                 name='group_type' 
                                 onChange={(e)=>inputSelectChangeHandler(e)}>
+                                  <option value="RR">Round Robin</option>
                                   <option value="SE">Single Elimination</option>
                                   <option value="DE">Double Elimination</option>
-                                  <option value="RR">Round Robin</option>
                                   <option value="SW">Swiss</option>
                             </Form.Select>
                           </Form.Group>

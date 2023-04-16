@@ -184,11 +184,11 @@ a:hover {
 .tools {
     text-align: right;
 }
-
+    
 .toolsSvg {
     display: block;
     fill: red;
-    background: inherit;
+    background: var(--opposite);
     border: none;
 } 
 

@@ -32,7 +32,7 @@ class TournamentSerializer(serializers.ModelSerializer):
             for i in brackets[0:-1]:
                 Bracket.objects.create(tournament=tournament, bracket=i, final=False, type=self.initial_data.get('group_type'))
                 
-            Bracket.objects.create(tournament=tournament, bracket=brackets[-1], type=self.initial_data.get('type'))
+            Bracket.objects.create(tournament=tournament, bracket=brackets[-1], participants_from_group=int(self.initial_data.get('advance_from_group')), type=self.initial_data.get('type'))
 
         else:
             if self.initial_data.get('type') == 'SE':
@@ -80,7 +80,8 @@ class BracketSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         # initial_data потому что нету в модели Bracket, а передается как дополнительное поле
         if validated_data.get('type') == 'SE':
-            single_el = SingleEl(clear_participants(self.initial_data.get('participants')), json.loads(self.initial_data.get('secod_final')))
+            print(self.initial_data.get('secod_final'))
+            single_el = SingleEl(clear_participants(self.initial_data.get('participants')), {}, self.initial_data.get('secod_final'))
             bracket = Bracket.objects.create(bracket=single_el.create_se_bracket(), type=validated_data.get('type'))
         elif validated_data.get('type') == 'RR':
             round_robin = RoundRobin(clear_participants(self.initial_data.get('participants')), 

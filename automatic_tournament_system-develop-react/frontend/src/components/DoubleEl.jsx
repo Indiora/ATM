@@ -20,7 +20,7 @@ const DoubleEl = ({bracket, id, owner}) => {
 
       
     return (
-        <>
+        <BracketWrapper>
             <Bracket mobileBreakpoint={992}>
                 {rounds.upper_rounds.map((round, i) => 
                     <Round key={round.title} mobileBreakpoint={992}>
@@ -52,9 +52,8 @@ const DoubleEl = ({bracket, id, owner}) => {
                      </SeedsList>
                  </Round>
              )}
-         </Bracket>
-       
-        </>
+            </Bracket>
+         </BracketWrapper>
     )};
 
 

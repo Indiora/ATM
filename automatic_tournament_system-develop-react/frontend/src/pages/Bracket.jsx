@@ -6,6 +6,7 @@ import PostService from "../API/PostService";
 import RoundRobin from '../components/RoundRobin';
 import SingleEl from '../components/SingleEl';
 import DoubleEl from '../components/DoubleEl';
+import Swiss from '../components/Swiss';
 import BracketWrapper from '../components/UI/BracketWrapper/BracketWrapper';
 
 const Bracket = () => {
@@ -27,26 +28,28 @@ const Bracket = () => {
         <section>
             {isBraLoadind
                 ? <div className='loader'><Loader/></div>
-                :   <div className="container" style={{width: '1500px', height: '1000px'}}>
-                        <BracketWrapper >
+                :   <div className="container" style={{width: '80%', height: '100%'}}>
                         {(() => {
-                            
-                                    if (type === "SE") {
-                                        return (
-                                            <SingleEl id={params.id} bracket={bracket} owner={''}/>
-                                        )
-                                    } else if (type === "RR") {
-                                        return (
-                                            <RoundRobin id={params.id} bracket={bracket} owner={''}/>
-                                        )
-                                    } else if (type === "DE") {
-                                        
-                                        return (
-                                            <DoubleEl id={params.id} bracket={bracket} owner={''}/>
-                                        )
-                                    }
-                            })()}
-                        </BracketWrapper>
+                            if (type === "SE") {
+                                return (
+                                    <SingleEl id={params.id} bracket={bracket} owner={''}/>
+                                )
+                            } else if (type === "RR") {
+                                return (
+                                    <RoundRobin id={params.id} bracket={bracket} owner={''}/>
+                                )
+                            } else if (type === "DE") {
+                                
+                                return (
+                                    <DoubleEl id={params.id} bracket={bracket} owner={''}/>
+                                )
+                            } else if (type == "SW") {
+                                return (
+                                    <Swiss id={params.id} bracket={bracket} owner={''}/>
+                                )
+                            }
+                        })()}
+
                     </div>
             
             }
