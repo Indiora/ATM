@@ -7,6 +7,7 @@ from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from tournaments.serializer import TournamentSerializer
 from .utils import send_email_for_verify
 
+
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
     @classmethod
     def get_token(cls, user):
@@ -50,7 +51,6 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
         fields = ["username", "date_joined", "email"]
-   
 
 
 class ProfileSerializer(serializers.ModelSerializer):

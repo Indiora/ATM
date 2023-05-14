@@ -1,11 +1,8 @@
-from django.test import TestCase
+# from django.test import TestCase
+import unittest
+from .utils import RoundRobin, SingleEl, DoubleEl, Swiss, MultiStage
 
-# Create your tests here.
 
-[[{"id": 0, "tournamentRoundText": "test", "startTime": "2021-05-30", "state": "SCHEDULED", "participants": [{"id": "d1", "resultText": 0, "isWinner": false, "status": null, "name": "1", "picture": null},
- {"id": "d1", "resultText": 0, "isWinner": false, "status": null, "name": "4", "picture": null}]},
-  {"id": 1, "tournamentRoundText": "test", "startTime": "2021-05-30", "state": "SCHEDULED",
-   "participants": [{"id": "d1", "resultText": 0, "isWinner": false, "status": null, "name": "2", "picture": null},
-    {"id": "d1", "resultText": 0, "isWinner": false, "status": null, "name": "3", "picture": null}]}],
- [{"id": 0, "tournamentRoundText": "test", "startTime": "2021-05-30", "state": "SCHEDULED", "participants": [{"id": "d1", "resultText": 0, "isWinner": false, "status": null, "name": "4", "picture": null}, {"id": "d1", "resultText": 0, "isWinner": false, "status": null, "name": "3", "picture": null}]}, {"id": 1, "tournamentRoundText": "test", "startTime": "2021-05-30", "state": "SCHEDULED", "participants": [{"id": "d1", "resultText": 0, "isWinner": false, "status": null, "name": "1", "picture": null}, {"id": "d1", "resultText": 0, "isWinner": false, "status": null, "name": "2", "picture": null}]}],
-  [{"id": 0, "tournamentRoundText": "test", "startTime": "2021-05-30", "state": "SCHEDULED", "participants": [{"id": "d1", "resultText": 0, "isWinner": false, "status": null, "name": "2", "picture": null}, {"id": "d1", "resultText": 0, "isWinner": false, "status": null, "name": "4", "picture": null}]}, {"id": 1, "tournamentRoundText": "test", "startTime": "2021-05-30", "state": "SCHEDULED", "participants": [{"id": "d1", "resultText": 0, "isWinner": false, "status": null, "name": "3", "picture": null}, {"id": "d1", "resultText": 0, "isWinner": false, "status": null, "name": "1", "picture": null}]}]]
+class RoundRobinEqSolverTestCase(unittest.TestCase):
+    def test_bracket(self):
+        pass

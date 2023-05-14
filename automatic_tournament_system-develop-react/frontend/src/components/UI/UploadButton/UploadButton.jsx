@@ -13,11 +13,13 @@ function UploadButton(props) {
   const handleUpload = () => {
     inputFile?.click();
   };
+  
   const handleDisplayFileDetails = () => {
     props.setInputFileValue(inputFile.files[0]);
     inputFile?.files && setUploadedFileName(inputFile.files[0].name);
 
   };
+
   return (
     <div>
       <label className="me-3">Choose file: </label>

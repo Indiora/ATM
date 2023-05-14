@@ -19,7 +19,7 @@ const MyMatch = ({id, seed, onPatch, match_id, round_id, owner, single=false}) =
     const [userTwoResult, setUserTwoResult] = useState(seed.teams[1].score)
     const { user } = useContext(AuthContext);
     const api = useAxios()
-    console.log(`${round_id} ${matchState}`)
+
 
     useEffect(()=>{
         setMatchState(seed.state)
@@ -82,12 +82,12 @@ const MyMatch = ({id, seed, onPatch, match_id, round_id, owner, single=false}) =
       setEditMatchCardModalShow(false)
     }
     
-
+  
 return (
   <>
   {single
     ? <SingleLineSeed mobileBreakpoint={992} style={{ fontSize: 14 }}>
-      <div>{moment(seed.startTime).format('dddd HH:mm') || ''}</div>
+      <div>{moment.parseZone(seed.startTime).format('Do MMMM h:mm a') || ''}</div>
       <SeedItem > 
           <div id={`id${seed.teams[0]?.id}`}
               className={classes.side}
@@ -152,7 +152,7 @@ return (
       </div>
   </SingleLineSeed>
   :<Seed mobileBreakpoint={992} style={{ fontSize: 14 }}>
-  <div>{moment(seed.startTime).format('dddd HH:mm') || ''}</div>
+  <div>{moment.parseZone(seed.startTime).format('Do MMMM h:mm a') || ''}</div>
   <SeedItem > 
       <div id={`id${seed.teams[0]?.id}`}
           className={classes.side}

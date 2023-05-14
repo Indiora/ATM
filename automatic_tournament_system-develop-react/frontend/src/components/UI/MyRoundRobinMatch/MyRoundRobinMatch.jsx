@@ -100,7 +100,7 @@ const MyRoundRobinMatch = ({id, match, match_id, round_id, onPatch, owner}) => {
     return (
         <div className="col-3">
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-            <div className={classes.topText}>{moment(match.startTime).format('dddd HH:mm') || ''}</div>
+            <div className={classes.topText}>{moment.parseZone(match.startTime).format('Do MMMM h:mm a') || ''}</div>
            
             </div>
             <div className={classes.myMatch}>

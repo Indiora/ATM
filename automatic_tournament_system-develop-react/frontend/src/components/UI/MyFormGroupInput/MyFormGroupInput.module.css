@@ -3,7 +3,7 @@
 }
 
 .myInput {
-    background: var(--dark);
+    background: var(--opposite);
     color: var(--dark-font-color);
     border-color: var(--dark-green);
     outline: var(--green);
@@ -11,7 +11,7 @@
 
 
 .myInput:focus {
-    background: var(--dark);
+    background: var(--opposite);
     color: var(--dark-font-color);
     border-color: var(--green);
     outline:var(--green);
