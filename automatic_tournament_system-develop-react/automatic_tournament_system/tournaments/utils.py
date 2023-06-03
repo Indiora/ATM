@@ -9,7 +9,7 @@ def clear_participants(participants: list) -> list:
 
 
 # игру выйграл проиграл, серию выиграл проиграл ничья
-    
+  
 
 class MultiStage:
     def __init__(self, participants: list, stage_info: dict, time_managment: dict={}, points: dict={}, second_final: bool=False) -> None:
@@ -18,7 +18,7 @@ class MultiStage:
         self.time_managment = time_managment
         self.points = points
         self.second_final = second_final
-
+    
     def create_multi_stage_brackets(self) -> dict:  
         brackets = []
         start = 0
@@ -45,7 +45,6 @@ class MultiStage:
                 end += self.stage_info.get('compete_in_group')
             final_time = brackets[-1].get('rounds')[-1][-1].get("startTime")
         else:
-        # elif self.stage_info.get('group_type') == 'SW':
             for i in range(len(self.participants) // self.stage_info.get('compete_in_group')):
                 group_stage = Swiss(self.participants[start:end], {'win': 1, 'loss': 0, 'draw': 0}, self.time_managment)
                 brackets.append(group_stage.create_swiss_bracket())
@@ -53,12 +52,12 @@ class MultiStage:
                 end += self.stage_info.get('compete_in_group')
             
             final_time = brackets[-1].get('rounds')[-1][-1].get("startTime")
-       
+
         TBO_participants = ['TBO' for i in range(len(self.participants) // self.stage_info.get('compete_in_group') * self.stage_info.get('advance_from_group'))] 
-       
+        
         final_time = datetime.datetime.strptime(final_time[:16], '%Y-%m-%d %H:%M')
         
-        self.time_managment['start_time'] = self.time_managment['start_time'] - datetime.timedelta(seconds=self.time_managment['start_time'].timestamp()) + datetime.timedelta(seconds=final_time.timestamp()) + datetime.timedelta(minutes=self.time_managment.get('break_between'))
+        self.time_managment['start_time'] = self.time_managment['start_time'] - datetime.timedelta(seconds=self.time_managment['start_time'].timestamp()) + datetime.timedelta(seconds=final_time.timestamp()) + datetime.timedelta(minutes=self.time_managment.get('break_between')) + datetime.timedelta(minutes=self.time_managment.get('avg_game_time')*self.time_managment.get('max_games_number'))
         if self.stage_info.get('type') == 'SE':
             final_stage = SingleEl(TBO_participants, self.time_managment, self.second_final)
             brackets.append(final_stage.create_se_bracket())
@@ -69,7 +68,6 @@ class MultiStage:
             final_stage = RoundRobin(TBO_participants, self.points, self.time_managment)
             brackets.append(final_stage.create_round_robin_bracket())
         else:
-        # elif self.stage_info.get('type') == 'SW':
             final_stage = Swiss(TBO_participants, self.points, self.time_managment)
             brackets.append(final_stage.create_swiss_bracket())
 
@@ -93,12 +91,14 @@ class MultiStage:
                     for match in round:
                         # not all match played
                         if match.get("state") == "SCHEDULED":
-                            stage_played = False
+                            stage_played = False    
                             break
 
             if stage_played == True:
-                table = sorted(instance.bracket.get('table'), reverse=True, key=lambda partic: (partic.get('berger'), partic.get('score')))
-                
+                if instance.type == 'RR':
+                    table = sorted(instance.bracket.get('table'), reverse=True, key=lambda partic: (partic.get('scores'), partic.get('berger')))
+                else:
+                    table = sorted(instance.bracket.get('table'), reverse=True, key=lambda partic: (partic.get('scores'), partic.get('buchholz')))
 
         elif instance.type == 'SE':
             for round in instance.bracket:
@@ -147,7 +147,6 @@ class MultiStage:
                                 table.append({'participant': match.get('teams')[1].get('participant')})
                             if {'participant': match.get('teams')[0].get('participant')} not in table:
                                 table.append({'participant': match.get('teams')[0].get('participant')})
-                print(table)
 
         if stage_played == True:
             if final_stage.type == 'SE':    
