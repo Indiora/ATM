@@ -3,6 +3,8 @@ import math
 import secrets
 import datetime
 from .models import Tournament, Bracket
+from functools import cmp_to_key
+
 
 def clear_participants(participants: list) -> list:
     return [i.strip() for i in re.split(r'[\n\r]+', participants)]
@@ -10,6 +12,34 @@ def clear_participants(participants: list) -> list:
 
 # игру выйграл проиграл, серию выиграл проиграл ничья
     
+
+# def compare_swiss(item1, item2):
+#     if item1.get('scores') < item2.get('scores'):
+#         return -1
+#     elif item1.get('scores') > item2.get('scores'):
+#         return 1
+#     else:
+#         if item1.get('buchholz') < item2.get('buchholz'):
+#             return -1
+#         elif item1.get('buchholz') > item2.get('buchholz'):
+#             return 1
+#         else:
+#             return 0
+        
+
+# def compare_rr(item1, item2): 
+#     if item1.get('scores') < item2.get('scores'):
+#         return -1
+#     elif item1.get('scores') > item2.get('scores'):
+#         return 1
+#     else:
+#         if item1.get('berger') < item2.get('berger'):
+#             return -1
+#         elif item1.get('berger') > item2.get('berger'):
+#             return 1
+#         else:
+#             return 0
+            
 
 class MultiStage:
     def __init__(self, participants: list, stage_info: dict, time_managment: dict={}, points: dict={}, second_final: bool=False) -> None:
@@ -19,6 +49,8 @@ class MultiStage:
         self.points = points
         self.second_final = second_final
 
+  
+    
     def create_multi_stage_brackets(self) -> dict:  
         brackets = []
         start = 0
@@ -53,12 +85,15 @@ class MultiStage:
                 end += self.stage_info.get('compete_in_group')
             
             final_time = brackets[-1].get('rounds')[-1][-1].get("startTime")
-       
+
         TBO_participants = ['TBO' for i in range(len(self.participants) // self.stage_info.get('compete_in_group') * self.stage_info.get('advance_from_group'))] 
-       
-        final_time = datetime.datetime.strptime(final_time[:16], '%Y-%m-%d %H:%M')
         
-        self.time_managment['start_time'] = self.time_managment['start_time'] - datetime.timedelta(seconds=self.time_managment['start_time'].timestamp()) + datetime.timedelta(seconds=final_time.timestamp()) + datetime.timedelta(minutes=self.time_managment.get('break_between'))
+        final_time = datetime.datetime.strptime(final_time[:16], '%Y-%m-%d %H:%M')
+        # final_time = f"{final_time + datetime.timedelta(minutes=self.time_managment.get('avg_game_time')*self.time_managment.get('max_games_number'))}"
+
+        
+        
+        self.time_managment['start_time'] = self.time_managment['start_time'] - datetime.timedelta(seconds=self.time_managment['start_time'].timestamp()) + datetime.timedelta(seconds=final_time.timestamp()) + datetime.timedelta(minutes=self.time_managment.get('break_between')) + datetime.timedelta(minutes=self.time_managment.get('avg_game_time')*self.time_managment.get('max_games_number'))
         if self.stage_info.get('type') == 'SE':
             final_stage = SingleEl(TBO_participants, self.time_managment, self.second_final)
             brackets.append(final_stage.create_se_bracket())
@@ -93,12 +128,15 @@ class MultiStage:
                     for match in round:
                         # not all match played
                         if match.get("state") == "SCHEDULED":
-                            stage_played = False
+                            stage_played = False    
                             break
 
             if stage_played == True:
-                table = sorted(instance.bracket.get('table'), reverse=True, key=lambda partic: (partic.get('berger'), partic.get('score')))
-                
+                if instance.type == 'RR':
+                    table = sorted(instance.bracket.get('table'), reverse=True, key=lambda partic: (partic.get('scores'), partic.get('berger')))
+                else:
+                    table = sorted(instance.bracket.get('table'), reverse=True, key=lambda partic: (partic.get('scores'), partic.get('buchholz')))
+                    print(table)
 
         elif instance.type == 'SE':
             for round in instance.bracket:
@@ -147,7 +185,8 @@ class MultiStage:
                                 table.append({'participant': match.get('teams')[1].get('participant')})
                             if {'participant': match.get('teams')[0].get('participant')} not in table:
                                 table.append({'participant': match.get('teams')[0].get('participant')})
-                print(table)
+
+        
 
         if stage_played == True:
             if final_stage.type == 'SE':    
@@ -328,7 +367,7 @@ class RoundRobin:
         bracket.get('rounds')[round_id][match_id] = match
 
         # Berger
-        # O(n/2 * log(n))
+        # O(log(n))
         for count, i in enumerate(bracket.get('rounds')[0:round_id+1]):
             for j in i:
                 # O(n)
@@ -1105,7 +1144,6 @@ class DoubleEl:
 
 class Swiss:
     def __init__(self, participants: list, points: dict, time_managment: dict={}) -> None:
-        print(participants)
         self.participants = [self.append_participant(name) for name in participants]
         self.match_table = [self.append_participant_to_table(name) for name in participants]
         self.points = points
@@ -1315,8 +1353,9 @@ class Swiss:
             round = []
             while len(parts) > 0:
                 previously_played = []
-                #O(n/2 * log(n))
+                #O(log(n))
                 for i in bracket.get('rounds'):
+                    #O(n/2)
                     for j in i:
                         if parts[0].get('participant') == j.get('participants')[0].get('participant'):
                             previously_played.append(j.get('participants')[1].get('participant'))

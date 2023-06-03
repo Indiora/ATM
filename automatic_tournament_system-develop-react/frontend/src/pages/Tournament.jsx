@@ -162,9 +162,11 @@ const Tournament = () => {
                                                     <Accordion.Item eventKey="2">
                                                         <Accordion.Header className="my_accordion_body"><h4>Final stage</h4></Accordion.Header>
                                                         <Accordion.Body className="my_accordion_body">
+                                                            
                                                             {isBraLoadind 
                                                                 ? <div className='loader'><Loader/></div>
                                                                 : <> 
+                                                                <h5 style={{'paddingLeft': "21px"}}>Final</h5>
                                                                     {(() => {
                                                                         if (types == "SE") {
                                                                             return (
