@@ -41,7 +41,6 @@ class TournamentDeleteAPIView(generics.DestroyAPIView):
     lookup_field = 'slug'
 
     def delete(self, request, *args, **kwargs):
-        print(request.user.username)
         return self.destroy(request, *args, **kwargs)
 
 
