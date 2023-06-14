@@ -1,17 +1,18 @@
 import React,   { useState, useCallback, useRef } from "react";
 import MyModal from "../ MyModal/MyModal";
-import MyButton from "../button/MyButton";
+import MyButton from "../MyButton/MyButton";
 import Modal from 'react-bootstrap/Modal';
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch"; 
 import { toPng, toJpeg, toSvg } from 'html-to-image'
 import { FullScreen, useFullScreenHandle } from "react-full-screen";
 import classes from "./BracketWrapper.module.css";
-
+import DownloadBracketIcon from "../../../assets/svg/DownloadBracketIcon";
 
 const BracketWrapper = ({children}) => {
   const ref = useRef(null)
   const handleFullScreen = useFullScreenHandle();
   const [modalShow, setModalShow] = useState(false);
+
 
   const filter = (node) => {
     const exclusionClasses = ['tools', ''];
@@ -81,20 +82,9 @@ const BracketWrapper = ({children}) => {
           <React.Fragment>
             <div className="tools">
               <button style={{border: 'none'}} data-tooltip="Download bracket" onClick={() => setModalShow(true)}> 
-                <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="15"
-                    height="15"
-                    fill="#000"
-                    version="1.1"
-                    viewBox="0 0 24 24"
-                    xmlSpace="preserve"
-                    className="toolsSvg"
-                >
-                    <path d="M24 24H0v-8h2v6h20v-6h2v8zm-12-5.6l-7.7-7.7 1.4-1.4 5.3 5.3V0h2v14.6l5.3-5.3 1.4 1.4-7.7 7.7z"></path>
-                </svg>
+                <DownloadBracketIcon/>
               </button>
-              <button onClick={handleFullScreen.enter} style={{border: 'none', background:'inherit'}} className="px-2">
+              {/* <button onClick={handleFullScreen.enter} style={{border: 'none', background:'inherit'}} className="px-2">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="16"
@@ -105,9 +95,9 @@ const BracketWrapper = ({children}) => {
                 <path fill="none" d="M0 0H20V20H0z"></path>
                 <path d="M7 2H2v5l1.8-1.8L6.5 8 8 6.5 5.2 3.8 7 2zm6 0l1.8 1.8L12 6.5 13.5 8l2.7-2.7L18 7V2h-5zm.5 10L12 13.5l2.7 2.7L13 18h5v-5l-1.8 1.8-2.7-2.8zm-7 0l-2.7 2.7L2 13v5h5l-1.8-1.8L8 13.5 6.5 12z"></path>
               </svg>
-              </button>
+              </button> */}
             </div>
-            <TransformComponent wrapperClass={'someText'}>
+            <TransformComponent>
 
             {children}
 

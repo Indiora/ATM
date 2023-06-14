@@ -6,14 +6,14 @@
     background: var(--dark);
 }
 
-.my_footer {
-
-}
-
 .my_footer_link {
     color: inherit !important;
 }
 
 .my_footer_link:hover {
     color:  var(--highlight-color) !important; 
+}
+
+.footer_text {
+    padding: .5rem 1rem;
 }

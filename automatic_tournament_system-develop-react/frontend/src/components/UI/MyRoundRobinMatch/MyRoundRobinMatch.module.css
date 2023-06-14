@@ -51,18 +51,6 @@
     border: none;
 }
 
-.matchSvg {
-    display: block;
-    fill: var(--dark-ligth);
-    background: var(--opposite);
-    border: none;
-} 
-
-.matchSvg:hover {
-    fill: var(--highlight-color);   
-}
-
-
 .myModalHeader{
     color: var(--dark-ligth);
     background: var(--opposite);

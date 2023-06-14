@@ -17,11 +17,11 @@
 }
 
 .my_drop {
-    left: 45%;
+    left: 60%;
     right: auto;
     border-color: inherit !important;
     border-width: 1px;
-    transform: translateX(-45%);
+    transform: translateX(-60%);
     background: inherit;
     color: var(--dark-ligth);
 
@@ -52,10 +52,3 @@
     }
 }
 
-.svg_logo{
-    fill: var(--dark-ligth)
-}
-
-.svg_logo:hover{
-    fill: var(--highlight-color)
-}
