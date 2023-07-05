@@ -5,6 +5,7 @@ import datetime
 from .models import Tournament, Bracket
 
 def clear_participants(participants: list) -> list:
+    print([i.strip() for i in re.split(r'[\n\r]+', participants)])
     return [i.strip() for i in re.split(r'[\n\r]+', participants)]
 
 
@@ -21,43 +22,62 @@ class MultiStage:
     
     def create_multi_stage_brackets(self) -> dict:  
         brackets = []
+        counter = 0
         start = 0
         end = self.stage_info.get('compete_in_group')
         if self.stage_info.get('group_type') == 'SE':
             for i in range(len(self.participants) // self.stage_info.get('compete_in_group')):
+                if counter == self.time_managment.get('groups_per_day'): 
+                    counter = 0
+                    self.time_managment['start_time'] = self.time_managment['start_time'] + datetime.timedelta(seconds=86400)
                 group_stage = SingleEl(self.participants[start:end], self.time_managment)
                 brackets.append(group_stage.create_se_bracket())
                 start += self.stage_info.get('compete_in_group')
                 end += self.stage_info.get('compete_in_group')
+                counter += 1
             final_time = brackets[-1][-1].get('seeds')[-1].get("startTime")
         elif self.stage_info.get('group_type') == 'DE':
             for i in range(len(self.participants) // self.stage_info.get('compete_in_group')):
+                if counter == self.time_managment.get('groups_per_day'): 
+                    counter = 0
+                    self.time_managment['start_time'] = self.time_managment['start_time'] + datetime.timedelta(seconds=86400)
                 group_stage = DoubleEl(self.participants[start:end], self.time_managment)
                 brackets.append(group_stage.create_de_bracket())
                 start += self.stage_info.get('compete_in_group')
-                end += self.stage_info.get('compete_in_group')  
+                end += self.stage_info.get('compete_in_group')
+                counter += 1  
             final_time = brackets[-1]["upper_rounds"][-1].get('seeds')[-1].get("startTime")
         elif self.stage_info.get('group_type') == 'RR':
             for i in range(len(self.participants) // self.stage_info.get('compete_in_group')):
+                if counter == self.time_managment.get('groups_per_day'): 
+                    counter = 0
+                    self.time_managment['start_time'] = self.time_managment['start_time'] + datetime.timedelta(seconds=86400)
                 group_stage = RoundRobin(self.participants[start:end], {'win': 1, 'loss': 0, 'draw': 0}, self.time_managment)
                 brackets.append(group_stage.create_round_robin_bracket())
                 start += self.stage_info.get('compete_in_group')
                 end += self.stage_info.get('compete_in_group')
+                counter += 1
             final_time = brackets[-1].get('rounds')[-1][-1].get("startTime")
         else:
             for i in range(len(self.participants) // self.stage_info.get('compete_in_group')):
+                if counter == self.time_managment.get('groups_per_day'): 
+                    counter = 0
+                    self.time_managment['start_time'] = self.time_managment['start_time'] + datetime.timedelta(seconds=86400)
                 group_stage = Swiss(self.participants[start:end], {'win': 1, 'loss': 0, 'draw': 0}, self.time_managment)
                 brackets.append(group_stage.create_swiss_bracket())
                 start += self.stage_info.get('compete_in_group')
                 end += self.stage_info.get('compete_in_group')
-            
+                counter += 1
             final_time = brackets[-1].get('rounds')[-1][-1].get("startTime")
 
         TBO_participants = ['TBO' for i in range(len(self.participants) // self.stage_info.get('compete_in_group') * self.stage_info.get('advance_from_group'))] 
         
-        final_time = datetime.datetime.strptime(final_time[:16], '%Y-%m-%d %H:%M')
+        if self.time_managment['final_stage_time']:
+            self.time_managment['start_time'] = self.time_managment['start_time'] + datetime.timedelta(seconds=86400)
+        else:
+            final_time = datetime.datetime.strptime(final_time[:16], '%Y-%m-%d %H:%M')
+            self.time_managment['start_time'] = self.time_managment['start_time'] - datetime.timedelta(seconds=self.time_managment['start_time'].timestamp()) + datetime.timedelta(seconds=final_time.timestamp()) + datetime.timedelta(minutes=self.time_managment.get('break_between')) + datetime.timedelta(minutes=self.time_managment.get('avg_game_time')*self.time_managment.get('max_games_number'))
         
-        self.time_managment['start_time'] = self.time_managment['start_time'] - datetime.timedelta(seconds=self.time_managment['start_time'].timestamp()) + datetime.timedelta(seconds=final_time.timestamp()) + datetime.timedelta(minutes=self.time_managment.get('break_between')) + datetime.timedelta(minutes=self.time_managment.get('avg_game_time')*self.time_managment.get('max_games_number'))
         if self.stage_info.get('type') == 'SE':
             final_stage = SingleEl(TBO_participants, self.time_managment, self.second_final)
             brackets.append(final_stage.create_se_bracket())

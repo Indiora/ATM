@@ -21,7 +21,8 @@ class TournamentSerializer(serializers.ModelSerializer):
                                     'type': self.initial_data.get('type'), 'group_type': self.initial_data.get('group_type'),},
                                     {'time_managment': json.loads(self.initial_data.get('time_managment')), 'start_time': validated_data.get('start_time'),
                                     'avg_game_time': int(self.initial_data.get('avg_game_time')), 'max_games_number': int(self.initial_data.get('max_games_number')),
-                                    'break_between': int(self.initial_data.get('break_between')),'mathes_same_time': int(self.initial_data.get('mathes_same_time')),},
+                                    'break_between': int(self.initial_data.get('break_between')),'mathes_same_time': int(self.initial_data.get('mathes_same_time')),
+                                    'groups_per_day': int(self.initial_data.get('groups_per_day')), 'final_stage_time': json.loads(self.initial_data.get('final_stage_time'))},
                                     {'win': int(self.initial_data.get('points_victory')), 'loss': int(self.initial_data.get('points_loss')), 'draw': int(self.initial_data.get('points_draw'))},
                                     json.loads(self.initial_data.get('secod_final'))
                                     )
@@ -41,6 +42,9 @@ class TournamentSerializer(serializers.ModelSerializer):
                                     'avg_game_time': int(self.initial_data.get('avg_game_time')), 'max_games_number': int(self.initial_data.get('max_games_number')),
                                     'break_between': int(self.initial_data.get('break_between')),'mathes_same_time': int(self.initial_data.get('mathes_same_time')),},
                                     json.loads(self.initial_data.get('secod_final')))
+                print({'time_managment': json.loads(self.initial_data.get('time_managment')), 'start_time': validated_data.get('start_time'),
+                                    'avg_game_time': int(self.initial_data.get('avg_game_time')), 'max_games_number': int(self.initial_data.get('max_games_number')),
+                                    'break_between': int(self.initial_data.get('break_between')),'mathes_same_time': int(self.initial_data.get('mathes_same_time')),})
                 bracket = single_el.create_se_bracket()
 
             elif self.initial_data.get('type') == 'DE':
